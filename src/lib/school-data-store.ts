@@ -145,6 +145,21 @@ export const getAllGradesForClass = (classId: string): StudentGrade[] => {
   return JSON.parse(JSON.stringify(MOCK_GRADES_STORE.filter(g => g.classId === classId)));
 };
 
+export const getStudentGradesForClass = (studentId: string, classId: string): { subject: Subject; grade?: number }[] => {
+  const subjects = getSubjects(); // Get all available subjects
+  const studentGradesForClass = MOCK_GRADES_STORE.filter(
+    (g) => g.studentId === studentId && g.classId === classId
+  );
+
+  return subjects.map((subject) => {
+    const gradeEntry = studentGradesForClass.find((g) => g.subjectId === subject.id);
+    return {
+      subject,
+      grade: gradeEntry?.grade,
+    };
+  });
+};
+
 
 export const subscribe = (listener: () => void): (() => void) => {
   listeners.push(listener);
@@ -160,3 +175,4 @@ const notifyListeners = (): void => {
 };
 
 export const CLASSES_AVAILABLE_FOR_REGISTRATION = MOCK_CLASSES_STORE.map(cls => ({ id: cls.id, name: cls.name }));
+
