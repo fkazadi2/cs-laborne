@@ -2,8 +2,6 @@
 // src/lib/school-data-store.ts
 "use client";
 
-// Import StudentRegistrationFormValues from the form component itself
-// This assumes StudentRegistrationFormValues is exported from student-registration-form.tsx
 import type { StudentRegistrationFormValues } from '@/components/student-registration-form';
 
 export interface Student {
@@ -21,6 +19,13 @@ export interface ClassData {
 export interface Subject {
   id: string;
   name: string;
+}
+
+export interface StudentGrade {
+  studentId: string;
+  classId: string; // Added for potential future filtering/reporting
+  subjectId: string;
+  grade: number;
 }
 
 let MOCK_CLASSES_STORE: ClassData[] = [
@@ -63,17 +68,18 @@ export const MOCK_SUBJECTS_STORE: Subject[] = [
   { id: 'history', name: 'Histoire' },
 ];
 
-// Store for detailed student registrations
+let MOCK_GRADES_STORE: StudentGrade[] = [];
+
 let MOCK_REGISTERED_STUDENTS_DETAILS: StudentRegistrationFormValues[] = [];
 
 let listeners: (() => void)[] = [];
 
 export const getClasses = (): ClassData[] => {
-  return JSON.parse(JSON.stringify(MOCK_CLASSES_STORE)); // Return a deep copy
+  return JSON.parse(JSON.stringify(MOCK_CLASSES_STORE)); 
 };
 
 export const getSubjects = (): Subject[] => {
-  return JSON.parse(JSON.stringify(MOCK_SUBJECTS_STORE)); // Return a deep copy
+  return JSON.parse(JSON.stringify(MOCK_SUBJECTS_STORE));
 }
 
 export const addStudentToClass = (classId: string, studentName: string): string => {
@@ -85,18 +91,45 @@ export const addStudentToClass = (classId: string, studentName: string): string 
   } else {
     console.warn(`Classe avec ID ${classId} non trouvée dans le magasin.`);
   }
-  return newStudentId; // Return the new student ID
+  return newStudentId;
 };
 
-// Functions for detailed student registrations
 export const addRegisteredStudentDetails = (details: StudentRegistrationFormValues): void => {
-  MOCK_REGISTERED_STUDENTS_DETAILS.push(JSON.parse(JSON.stringify(details))); // Store a deep copy
+  MOCK_REGISTERED_STUDENTS_DETAILS.push(JSON.parse(JSON.stringify(details)));
   notifyListeners();
 };
 
 export const getRegisteredStudentDetails = (): StudentRegistrationFormValues[] => {
-  return JSON.parse(JSON.stringify(MOCK_REGISTERED_STUDENTS_DETAILS)); // Return a deep copy
+  return JSON.parse(JSON.stringify(MOCK_REGISTERED_STUDENTS_DETAILS));
 };
+
+export const setStudentGrade = (classId: string, studentId: string, subjectId: string, grade: number): void => {
+  const existingGradeIndex = MOCK_GRADES_STORE.findIndex(
+    g => g.studentId === studentId && g.subjectId === subjectId && g.classId === classId
+  );
+  if (isNaN(grade)) { // Handle potential NaN if input is cleared or invalid before explicit validation
+    if (existingGradeIndex > -1) {
+      MOCK_GRADES_STORE.splice(existingGradeIndex, 1); // Remove grade if it becomes invalid (e.g. empty input)
+    }
+  } else {
+    if (existingGradeIndex > -1) {
+      MOCK_GRADES_STORE[existingGradeIndex].grade = grade;
+    } else {
+      MOCK_GRADES_STORE.push({ classId, studentId, subjectId, grade });
+    }
+  }
+  notifyListeners();
+  console.log("Updated MOCK_GRADES_STORE:", MOCK_GRADES_STORE);
+};
+
+export const getStudentGrade = (classId: string, studentId: string, subjectId: string): number | undefined => {
+  const foundGrade = MOCK_GRADES_STORE.find(g => g.studentId === studentId && g.subjectId === subjectId && g.classId === classId);
+  return foundGrade?.grade;
+};
+
+export const getGradesForClassSubject = (classId: string, subjectId: string): StudentGrade[] => {
+    return MOCK_GRADES_STORE.filter(g => g.classId === classId && g.subjectId === subjectId);
+}
 
 
 export const subscribe = (listener: () => void): (() => void) => {

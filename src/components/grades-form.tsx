@@ -8,108 +8,133 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from "@/hooks/use-toast";
-import { AlertTriangle, CheckCircle, Loader2, Save, ClipboardList } from 'lucide-react';
-import { getClasses, getSubjects, subscribe, type ClassData, type Subject as StoreSubject, type Student as StoreStudent } from '@/lib/school-data-store';
+import { AlertTriangle, CheckCircle, Loader2, Save, ClipboardEdit, BookOpen, Users } from 'lucide-react';
+import { 
+  getClasses, 
+  getSubjects, 
+  subscribe, 
+  setStudentGrade,
+  getStudentGrade,
+  type ClassData, 
+  type Subject as StoreSubject, 
+  type Student as StoreStudent 
+} from '@/lib/school-data-store';
 
-// Student type for this form, can be simpler if grade-specific details are not needed yet
-interface StudentForGrades extends Pick<StoreStudent, 'id' | 'name'> {}
-interface ClassDataForGrades extends Omit<ClassData, 'students'> {
-  students: StudentForGrades[];
-}
+// Simplified student structure for this form
+interface StudentSimple extends Pick<StoreStudent, 'id' | 'name'> {}
 
 export function GradesForm() {
-  const [allClasses, setAllClasses] = useState<ClassDataForGrades[]>(getClasses().map(c => ({...c, students: c.students.map(s => ({id: s.id, name: s.name}))})));
+  const [allClasses, setAllClasses] = useState<ClassData[]>(getClasses());
   const [allSubjects, setAllSubjects] = useState<StoreSubject[]>(getSubjects());
 
   const [selectedClassId, setSelectedClassId] = useState<string | undefined>(allClasses[0]?.id);
-  const [selectedStudentId, setSelectedStudentId] = useState<string | undefined>();
   const [selectedSubjectId, setSelectedSubjectId] = useState<string | undefined>(allSubjects[0]?.id);
-  const [grade, setGrade] = useState<string>('');
+  
+  // Store grades as { [studentId]: grade_value_as_string }
+  const [grades, setGrades] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { toast } = useToast();
 
   useEffect(() => {
     const unsubscribe = subscribe(() => {
       const updatedClassesFromStore = getClasses();
-      const updatedClassesForGrades = updatedClassesFromStore.map(c => ({
-        ...c,
-        students: c.students.map(s => ({id: s.id, name: s.name})) // Map to simplified student structure
-      }));
-      setAllClasses(updatedClassesForGrades);
+      setAllClasses(updatedClassesFromStore);
 
-      const currentSelectedClassStillExists = updatedClassesForGrades.find(c => c.id === selectedClassId);
-      if (!currentSelectedClassStillExists && updatedClassesForGrades.length > 0) {
-        setSelectedClassId(updatedClassesForGrades[0].id);
-        setSelectedStudentId(undefined); // Reset student as class changed
-      } else if (!currentSelectedClassStillExists && updatedClassesForGrades.length === 0) {
-        setSelectedClassId(undefined);
-        setSelectedStudentId(undefined);
-      } else if (currentSelectedClassStillExists && selectedStudentId && !currentSelectedClassStillExists.students.find(s => s.id === selectedStudentId)) {
-        // If current student is no longer in the (potentially updated) selected class
-        setSelectedStudentId(undefined);
+      // If selected class is removed, reset or pick first
+      if (selectedClassId && !updatedClassesFromStore.find(c => c.id === selectedClassId)) {
+        setSelectedClassId(updatedClassesFromStore[0]?.id);
+      } else if (!selectedClassId && updatedClassesFromStore.length > 0) {
+        setSelectedClassId(updatedClassesFromStore[0]?.id);
       }
     });
     return () => unsubscribe();
-  }, [selectedClassId, selectedStudentId]);
-
+  }, [selectedClassId]);
 
   const currentClass = useMemo(() => allClasses.find(c => c.id === selectedClassId), [selectedClassId, allClasses]);
-  const currentStudents = useMemo(() => currentClass?.students || [], [currentClass]);
+  const studentsInSelectedClass: StudentSimple[] = useMemo(() => {
+    return currentClass?.students.map(s => ({ id: s.id, name: s.name })) || [];
+  }, [currentClass]);
 
+  // Pre-fill grades when class or subject changes
   useEffect(() => {
-    // Auto-select first student if class changes or currentStudents list updates and no student is selected
-    if (currentStudents.length > 0 && !selectedStudentId) {
-        setSelectedStudentId(currentStudents[0].id);
-    } else if (currentStudents.length === 0) {
-        setSelectedStudentId(undefined); // No students in class, so no student selected
+    if (selectedClassId && selectedSubjectId && studentsInSelectedClass.length > 0) {
+      const newGrades: Record<string, string> = {};
+      studentsInSelectedClass.forEach(student => {
+        const existingGrade = getStudentGrade(selectedClassId, student.id, selectedSubjectId);
+        newGrades[student.id] = existingGrade !== undefined ? String(existingGrade) : '';
+      });
+      setGrades(newGrades);
+    } else {
+      setGrades({}); // Reset grades if no class/subject or no students
     }
-  }, [currentStudents, selectedStudentId, selectedClassId]);
+  }, [selectedClassId, selectedSubjectId, studentsInSelectedClass]);
 
+
+  const handleGradeChange = (studentId: string, value: string) => {
+    setGrades(prevGrades => ({
+      ...prevGrades,
+      [studentId]: value,
+    }));
+  };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!selectedClassId || !selectedStudentId || !selectedSubjectId || grade.trim() === '') {
+    if (!selectedClassId || !selectedSubjectId || studentsInSelectedClass.length === 0) {
       toast({
         variant: "destructive",
         title: "Informations Manquantes",
-        description: "Veuillez sélectionner une classe, un élève, une matière et saisir une note.",
+        description: "Veuillez sélectionner une classe et une matière.",
         action: <AlertTriangle className="text-red-500" />,
       });
       return;
     }
 
-    const numericGrade = parseFloat(grade);
-    if (isNaN(numericGrade) || numericGrade < 0 || numericGrade > 20) {
-         toast({
-            variant: "destructive",
-            title: "Note Invalide",
-            description: "La note doit être un nombre entre 0 et 20.",
-            action: <AlertTriangle className="text-red-500" />,
+    let allGradesValid = true;
+    for (const studentId in grades) {
+      const gradeStr = grades[studentId];
+      if (gradeStr.trim() === '') continue; // Allow empty grades (not yet graded)
+
+      const numericGrade = parseFloat(gradeStr);
+      if (isNaN(numericGrade) || numericGrade < 0 || numericGrade > 20) {
+        allGradesValid = false;
+        const student = studentsInSelectedClass.find(s => s.id === studentId);
+        toast({
+          variant: "destructive",
+          title: "Note Invalide",
+          description: `La note pour ${student?.name || 'un élève'} ("${gradeStr}") doit être un nombre entre 0 et 20, ou vide.`,
+          action: <AlertTriangle className="text-red-500" />,
         });
-        return;
+        break; 
+      }
     }
 
+    if (!allGradesValid) return;
+
     setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+
+    Object.entries(grades).forEach(([studentId, gradeStr]) => {
+      if (gradeStr.trim() !== '') { // Only save non-empty grades
+        setStudentGrade(selectedClassId, studentId, selectedSubjectId, parseFloat(gradeStr));
+      } else { // If grade is cleared, we might want to remove it from store or handle as 'not graded'
+        // For now, setStudentGrade handles NaN by potentially removing it if it existed.
+        // If we want to explicitly remove, we'd call a removeStudentGrade function.
+        setStudentGrade(selectedClassId, studentId, selectedSubjectId, NaN); // Or handle removal
+      }
+    });
+    
     setIsLoading(false);
 
-    console.log('Données de note enregistrées :', {
-      classId: selectedClassId,
-      studentId: selectedStudentId,
-      subjectId: selectedSubjectId,
-      grade: numericGrade,
-    });
-
-    const studentName = currentStudents.find(s => s.id === selectedStudentId)?.name;
-    const subjectName = allSubjects.find(s => s.id === selectedSubjectId)?.name;
+    const currentSubjectName = allSubjects.find(s => s.id === selectedSubjectId)?.name;
+    const currentClassName = currentClass?.name;
 
     toast({
-      title: "Note Enregistrée !",
-      description: `La note pour ${studentName} en ${subjectName} a été enregistrée : ${numericGrade}/20.`,
+      title: "Notes Enregistrées !",
+      description: `Les notes pour ${currentSubjectName} en ${currentClassName} ont été mises à jour.`,
       action: <CheckCircle className="text-green-500" />,
     });
-    setGrade(''); 
   };
   
   if (allClasses.length === 0) {
@@ -117,7 +142,7 @@ export function GradesForm() {
       <Card className="shadow-lg rounded-lg">
         <CardHeader>
           <CardTitle className="text-2xl text-primary flex items-center">
-            <ClipboardList className="mr-2 h-6 w-6" /> Saisie des Notes
+            <ClipboardEdit className="mr-2 h-6 w-6" /> Saisie des Notes par Classe
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -132,7 +157,7 @@ export function GradesForm() {
       <Card className="shadow-lg rounded-lg">
         <CardHeader>
           <CardTitle className="text-2xl text-primary flex items-center">
-            <ClipboardList className="mr-2 h-6 w-6" /> Saisie des Notes
+            <ClipboardEdit className="mr-2 h-6 w-6" /> Saisie des Notes par Classe
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -147,20 +172,22 @@ export function GradesForm() {
       <form onSubmit={handleSubmit}>
         <CardHeader>
           <CardTitle className="text-2xl text-primary flex items-center">
-             <ClipboardList className="mr-2 h-6 w-6" /> Saisir une Note
+             <ClipboardEdit className="mr-2 h-6 w-6" /> Saisir les Notes pour une Classe
           </CardTitle>
           <CardDescription>
-            Sélectionnez la classe, l'élève, la matière et entrez la note.
+            Sélectionnez une classe et une matière, puis entrez les notes pour chaque élève.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
+          <div className="grid md:grid-cols-2 gap-4 items-end">
             <div>
-              <Label htmlFor="class-select" className="mb-2 block font-medium">Classe</Label>
+              <Label htmlFor="class-select" className="mb-2 block font-medium flex items-center">
+                <Users className="mr-2 h-4 w-4 text-muted-foreground" /> Classe
+              </Label>
               <Select 
                 onValueChange={(value) => {
                   setSelectedClassId(value);
-                  setSelectedStudentId(undefined); 
+                  setGrades({}); // Reset grades when class changes
                 }} 
                 value={selectedClassId} 
                 disabled={isLoading || allClasses.length === 0}
@@ -179,28 +206,17 @@ export function GradesForm() {
             </div>
 
             <div>
-              <Label htmlFor="student-select" className="mb-2 block font-medium">Élève</Label>
+              <Label htmlFor="subject-select" className="mb-2 block font-medium flex items-center">
+                <BookOpen className="mr-2 h-4 w-4 text-muted-foreground" /> Matière
+              </Label>
               <Select 
-                onValueChange={setSelectedStudentId} 
-                value={selectedStudentId} 
-                disabled={isLoading || currentStudents.length === 0}
+                onValueChange={(value) => {
+                  setSelectedSubjectId(value);
+                  setGrades({}); // Reset grades when subject changes
+                }} 
+                value={selectedSubjectId} 
+                disabled={isLoading || allSubjects.length === 0}
               >
-                <SelectTrigger id="student-select" className="w-full">
-                  <SelectValue placeholder={currentStudents.length === 0 ? "Aucun élève dans la classe" : "Sélectionnez un élève"} />
-                </SelectTrigger>
-                <SelectContent>
-                  {currentStudents.map((student) => (
-                    <SelectItem key={student.id} value={student.id}>
-                      {student.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label htmlFor="subject-select" className="mb-2 block font-medium">Matière</Label>
-              <Select onValueChange={setSelectedSubjectId} value={selectedSubjectId} disabled={isLoading || allSubjects.length === 0}>
                 <SelectTrigger id="subject-select" className="w-full">
                   <SelectValue placeholder="Sélectionnez une matière" />
                 </SelectTrigger>
@@ -215,24 +231,52 @@ export function GradesForm() {
             </div>
           </div>
           
-          <div>
-            <Label htmlFor="grade-input" className="mb-2 block font-medium">Note (sur 20)</Label>
-            <Input
-              id="grade-input"
-              type="number"
-              placeholder="Ex: 15.5"
-              value={grade}
-              onChange={(e) => setGrade(e.target.value)}
-              disabled={isLoading}
-              min="0"
-              max="20"
-              step="0.1"
-            />
-          </div>
+          {selectedClassId && selectedSubjectId && studentsInSelectedClass.length > 0 && (
+            <div className="overflow-x-auto rounded-md border mt-6">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="font-semibold">Nom de l'Élève</TableHead>
+                    <TableHead className="font-semibold text-right w-[150px]">Note (/20)</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {studentsInSelectedClass.map((student) => (
+                    <TableRow key={student.id}>
+                      <TableCell className="py-3">{student.name}</TableCell>
+                      <TableCell className="py-3 text-right">
+                        <Input
+                          type="number"
+                          placeholder="Ex: 15.5"
+                          value={grades[student.id] || ''}
+                          onChange={(e) => handleGradeChange(student.id, e.target.value)}
+                          disabled={isLoading}
+                          min="0"
+                          max="20"
+                          step="0.1"
+                          className="max-w-[100px] ml-auto text-right"
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+
+          {selectedClassId && selectedSubjectId && studentsInSelectedClass.length === 0 && (
+            <p className="text-muted-foreground text-center py-4">
+              Aucun élève dans la classe sélectionnée.
+            </p>
+          )}
 
         </CardContent>
         <CardFooter>
-          <Button type="submit" disabled={isLoading || !selectedStudentId || !selectedSubjectId} className="w-full md:w-auto">
+          <Button 
+            type="submit" 
+            disabled={isLoading || !selectedClassId || !selectedSubjectId || studentsInSelectedClass.length === 0} 
+            className="w-full md:w-auto"
+          >
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -241,7 +285,7 @@ export function GradesForm() {
             ) : (
               <>
                 <Save className="mr-2 h-4 w-4" />
-                Enregistrer la Note
+                Enregistrer les Notes
               </>
             )}
           </Button>
