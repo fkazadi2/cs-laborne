@@ -69,7 +69,7 @@ const MOCK_CLASSES: ClassData[] = [
 
 export function AttendanceForm() {
   const [selectedClassId, setSelectedClassId] = useState<string | undefined>(MOCK_CLASSES[0]?.id);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined); // Initialize to undefined
   const [students, setStudents] = useState<Student[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [recordedAttendances, setRecordedAttendances] = useState<RecordedAttendance[]>([]);
@@ -77,10 +77,20 @@ export function AttendanceForm() {
 
   const currentClass = useMemo(() => MOCK_CLASSES.find(c => c.id === selectedClassId), [selectedClassId]);
 
+  // Set initial date on client-side after hydration
+  useEffect(() => {
+    setSelectedDate(new Date());
+  }, []);
+
   useEffect(() => {
     if (currentClass) {
       // Reset student attendance to 'not_set' when class or date changes
-      setStudents(currentClass.students.map(s => ({ ...s, attendance: 'not_set' })));
+      // Also, ensure students are reset if the date is not yet defined (initial load)
+      if (selectedDate) {
+        setStudents(currentClass.students.map(s => ({ ...s, attendance: 'not_set' })));
+      } else {
+         setStudents(currentClass.students.map(s => ({ ...s, attendance: 'not_set' })));
+      }
     } else {
       setStudents([]);
     }
@@ -113,7 +123,7 @@ export function AttendanceForm() {
     const newRecord: RecordedAttendance = {
       id: `rec_${Date.now()}`, // Simple unique ID
       classInfo: { id: currentClass.id, name: currentClass.name },
-      date: selectedDate,
+      date: selectedDate, // selectedDate will be defined here due to form validation
       students: JSON.parse(JSON.stringify(students)), // Deep copy
       submissionTime: new Date(),
     };
@@ -136,9 +146,9 @@ export function AttendanceForm() {
 
   const getAttendanceBadgeVariant = (status: Student['attendance']) => {
     switch (status) {
-      case 'present': return 'default'; // Or a custom green-like variant if defined
+      case 'present': return 'default'; 
       case 'absent': return 'destructive';
-      case 'late': return 'secondary'; // Or a custom yellow-like variant
+      case 'late': return 'secondary'; 
       default: return 'outline';
     }
   };
@@ -154,8 +164,6 @@ export function AttendanceForm() {
 
 
   if (!currentClass && MOCK_CLASSES.length > 0) {
-    // This handles the initial render case if MOCK_CLASSES[0] is undefined (e.g. empty MOCK_CLASSES)
-    // or if selectedClassId somehow becomes invalid.
     return (
       <Card className="shadow-lg rounded-lg">
         <CardHeader>
@@ -224,11 +232,11 @@ export function AttendanceForm() {
               </div>
               <div>
                 <Label htmlFor="date-picker" className="mb-2 block font-medium">Date</Label>
-                <DatePicker date={selectedDate} setDate={setSelectedDate} buttonProps={{id:"date-picker", disabled:isLoading}}/>
+                <DatePicker date={selectedDate} setDate={setSelectedDate} buttonProps={{id:"date-picker", disabled:isLoading || !selectedDate}}/>
               </div>
             </div>
 
-            {students.length > 0 ? (
+            {students.length > 0 && selectedDate ? ( // Ensure selectedDate is defined before rendering table
               <div className="overflow-x-auto rounded-md border">
                 <Table>
                   <TableHeader>
@@ -269,12 +277,12 @@ export function AttendanceForm() {
               </div>
             ) : (
               <p className="text-muted-foreground text-center py-4">
-                Aucun élève trouvé pour cette classe, ou classe non sélectionnée.
+                { !selectedDate ? "Chargement de la date..." : "Aucun élève trouvé pour cette classe, ou classe non sélectionnée."}
               </p>
             )}
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={isLoading || students.length === 0} className="w-full md:w-auto">
+            <Button type="submit" disabled={isLoading || students.length === 0 || !selectedDate} className="w-full md:w-auto">
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -353,5 +361,3 @@ export function AttendanceForm() {
     </>
   );
 }
-
-    
