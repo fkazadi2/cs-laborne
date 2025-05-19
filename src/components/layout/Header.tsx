@@ -3,7 +3,7 @@
 "use client";
 
 import Link from 'next/link';
-import { BookOpen, Edit3, Home, Users, CalendarCheck2, UserPlus } from 'lucide-react'; // Ajout de UserPlus
+import { BookOpen, Edit3, Home, Users, CalendarCheck2, UserPlus, ClipboardList } from 'lucide-react'; // Ajout de ClipboardList
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -11,9 +11,10 @@ import { Button } from '@/components/ui/button';
 const navItems = [
   { href: '/', label: 'Accueil', icon: Home },
   { href: '/public', label: 'Portail Public', icon: Users },
-  { href: '/inscription-eleve', label: 'Inscriptions', icon: UserPlus }, // Ajout du lien Inscriptions
-  { href: '/learning-material', label: 'Matériel Pédagogique', icon: BookOpen },
+  { href: '/inscription-eleve', label: 'Inscriptions', icon: UserPlus },
   { href: '/attendance', label: 'Présences', icon: CalendarCheck2 },
+  { href: '/grades', label: 'Notes et Bulletins', icon: ClipboardList }, // Ajout du lien Notes et Bulletins
+  { href: '/learning-material', label: 'Matériel Pédagogique', icon: BookOpen },
 ];
 
 export function Header() {
@@ -29,19 +30,19 @@ export function Header() {
               <span>La Borne Connect</span>
             </Link>
           </div>
-          <nav className="hidden md:flex space-x-1 lg:space-x-2"> {/* Adjusted spacing for more items */}
+          <nav className="hidden md:flex flex-wrap justify-center space-x-1 lg:space-x-1"> {/* Ajustement pour flex-wrap et spacing */}
             {navItems.map((item) => (
               <Button
                 key={item.label}
                 variant={pathname === item.href ? 'default' : 'ghost'}
                 asChild
                 className={cn(
-                  "font-medium px-3 py-2 text-sm", // Ajustement de la taille pour plus d'items
+                  "font-medium px-2.5 py-2 text-xs lg:text-sm", // Ajustement de la taille pour plus d'items
                   pathname === item.href ? "text-primary-foreground" : "text-foreground hover:text-primary"
                 )}
               >
-                <Link href={item.href} className="flex items-center gap-2">
-                  <item.icon className="h-4 w-4" />
+                <Link href={item.href} className="flex items-center gap-1.5 lg:gap-2">
+                  <item.icon className="h-3.5 w-3.5 lg:h-4 lg:w-4" />
                   {item.label}
                 </Link>
               </Button>

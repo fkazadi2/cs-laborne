@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, BookOpen, CalendarCheck2, ArrowRight, UserPlus } from 'lucide-react'; // Ajout de UserPlus
+import { Users, BookOpen, CalendarCheck2, ArrowRight, UserPlus, ClipboardList } from 'lucide-react'; // Ajout de ClipboardList
 
 const features = [
   {
@@ -13,18 +13,11 @@ const features = [
     dataAiHint: 'community engagement'
   },
   {
-    icon: UserPlus, // Nouvelle icône
-    title: "Inscriptions des Élèves", // Nouveau titre
-    description: "Gérez facilement les inscriptions des nouveaux élèves, soumettez les formulaires et documents nécessaires en ligne.", // Nouvelle description
-    link: '/inscription-eleve', // Nouveau lien
-    dataAiHint: 'student enrollment' // Nouveau hint
-  },
-  {
-    icon: BookOpen,
-    title: 'Générateur de Matériel Pédagogique',
-    description: "Les enseignants peuvent créer sans effort des fiches de révision et des questions pratiques à partir du contenu des cours en utilisant l'IA.",
-    link: '/learning-material',
-    dataAiHint: 'education technology'
+    icon: UserPlus,
+    title: "Inscriptions des Élèves",
+    description: "Gérez facilement les inscriptions des nouveaux élèves, soumettez les formulaires et documents nécessaires en ligne.",
+    link: '/inscription-eleve',
+    dataAiHint: 'student enrollment'
   },
   {
     icon: CalendarCheck2,
@@ -32,6 +25,20 @@ const features = [
     description: "Une interface facile à utiliser pour que les enseignants puissent rapidement marquer les présences des élèves.",
     link: '/attendance',
     dataAiHint: 'classroom management'
+  },
+  {
+    icon: ClipboardList, // Nouvelle icône
+    title: "Gestion des Notes et Bulletins", // Nouveau titre
+    description: "Encodez les notes par matière, calculez les moyennes et préparez la génération des bulletins PDF.", // Nouvelle description
+    link: '/grades', // Nouveau lien
+    dataAiHint: 'academic records' // Nouveau hint
+  },
+  {
+    icon: BookOpen,
+    title: 'Générateur de Matériel Pédagogique',
+    description: "Les enseignants peuvent créer sans effort des fiches de révision et des questions pratiques à partir du contenu des cours en utilisant l'IA.",
+    link: '/learning-material',
+    dataAiHint: 'education technology'
   },
 ];
 
@@ -57,7 +64,7 @@ export default function HomePage() {
 
       <section className="w-full py-12 md:py-16">
         <h2 className="text-3xl font-semibold text-center mb-10 text-primary">Fonctionnalités Principales</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8"> {/* Changé lg:grid-cols-3 à md:grid-cols-2 pour 4 cartes */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature) => (
             <Card key={feature.title} className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-lg overflow-hidden">
               <CardHeader className="bg-primary/10 p-6">
@@ -74,7 +81,7 @@ export default function HomePage() {
               <div className="p-6 pt-0 mt-auto">
                 <Button variant="outline" asChild className="w-full group">
                   <Link href={feature.link}>
-                    Aller à {feature.title.startsWith("Portail") || feature.title.startsWith("Générateur") || feature.title.startsWith("Saisie") ? feature.title : feature.title.replace("des Élèves", "")} {/* Simplification du texte du bouton */}
+                    Aller à {feature.title.replace("des Élèves", "").replace("d'Information Publique", "").replace("Simplifiée des Présences", "").replace("Générateur de ", "").replace("Gestion des ", "")}
                     <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </Button>
