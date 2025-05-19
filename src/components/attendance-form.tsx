@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { AlertTriangle, CheckCircle, Loader2, Save, ListChecks, Users, CalendarDays, Filter } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { format, isSameDay } from 'date-fns';
+import { fr } from 'date-fns/locale'; // Import fr locale for date formatting
 
 interface Student {
   id: string;
@@ -76,28 +77,27 @@ export function AttendanceForm() {
   const [recordedAttendances, setRecordedAttendances] = useState<RecordedAttendance[]>([]);
   const { toast } = useToast();
 
-  // State for history filters
   const [filterDate, setFilterDate] = useState<Date | undefined>(undefined);
-  const [filterClassId, setFilterClassId] = useState<string | undefined>(undefined); // undefined means "All Classes"
+  const [filterClassId, setFilterClassId] = useState<string | undefined>(undefined);
+  const [maxCalendarDate, setMaxCalendarDate] = useState<Date | undefined>(undefined);
+
 
   const currentClass = useMemo(() => MOCK_CLASSES.find(c => c.id === selectedClassId), [selectedClassId]);
 
   useEffect(() => {
-    setSelectedDate(new Date());
-    setFilterDate(new Date()); // Initialize filter date as well
+    const today = new Date();
+    setSelectedDate(today);
+    setFilterDate(today); 
+    setMaxCalendarDate(today);
   }, []);
 
   useEffect(() => {
     if (currentClass) {
-      if (selectedDate) {
-        setStudents(currentClass.students.map(s => ({ ...s, attendance: 'not_set' })));
-      } else {
-         setStudents(currentClass.students.map(s => ({ ...s, attendance: 'not_set' })));
-      }
+      setStudents(currentClass.students.map(s => ({ ...s, attendance: 'not_set' })));
     } else {
       setStudents([]);
     }
-  }, [selectedClassId, selectedDate, currentClass]);
+  }, [selectedClassId, currentClass]);
 
   const handleAttendanceChange = (studentId: string, value: Student['attendance']) => {
     setStudents((prevStudents) =>
@@ -126,9 +126,10 @@ export function AttendanceForm() {
       id: `rec_${Date.now()}`,
       classInfo: { id: currentClass.id, name: currentClass.name },
       date: selectedDate,
-      students: JSON.parse(JSON.stringify(students)),
+      students: JSON.parse(JSON.stringify(students)), // Deep copy
       submissionTime: new Date(),
     };
+    console.log("Données de présence enregistrées localement:", newRecord);
 
     setRecordedAttendances(prevRecords => [newRecord, ...prevRecords.slice(0, 4)]);
     setIsLoading(false);
@@ -167,7 +168,7 @@ export function AttendanceForm() {
   }, [recordedAttendances, filterDate, filterClassId]);
 
 
-  if (!currentClass && MOCK_CLASSES.length > 0) {
+  if (!currentClass && MOCK_CLASSES.length > 0 && !selectedClassId) {
     return (
       <Card className="shadow-lg rounded-lg">
         <CardHeader>
@@ -239,7 +240,7 @@ export function AttendanceForm() {
                   date={selectedDate} 
                   setDate={setSelectedDate} 
                   buttonProps={{id:"date-picker", disabled:isLoading || !selectedDate}}
-                  calendarProps={{ disabled: (date) => date > new Date() }} // Prevent selecting future dates
+                  calendarProps={{ disabled: maxCalendarDate ? (date) => date > maxCalendarDate : () => false }}
                 />
               </div>
             </div>
@@ -328,6 +329,7 @@ export function AttendanceForm() {
                             setDate={(date) => setFilterDate(date)} 
                             placeholder="Toutes les dates"
                             buttonProps={{id:"filter-date-picker", variant: "outline"}}
+                            calendarProps={{ disabled: maxCalendarDate ? (date) => date > maxCalendarDate : () => false }}
                          />
                     </div>
                     <div>
@@ -360,7 +362,7 @@ export function AttendanceForm() {
                             </div>
                             <div className="flex items-center text-sm text-muted-foreground mt-1">
                                 <CalendarDays className="mr-2 h-4 w-4" />
-                                {format(record.date, "PPP", { locale: (await import('date-fns/locale/fr')).fr })}
+                                {format(record.date, "PPP", { locale: fr })}
                             </div>
                             </div>
                             <p className="text-xs text-muted-foreground self-start sm:self-center">
