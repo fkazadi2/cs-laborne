@@ -3,7 +3,7 @@
 "use client";
 
 import Link from 'next/link';
-import { BookOpen, Edit3, Home, Users, CalendarCheck2, UserPlus, ClipboardList, ListOrdered } from 'lucide-react';
+import { BookOpen, Edit3, Home, Users, CalendarCheck2, UserPlus, ClipboardList, ListOrdered, FileText } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,8 @@ const navItems = [
   { href: '/inscription-eleve', label: 'Inscriptions', icon: UserPlus },
   { href: '/liste-eleves', label: 'Liste Élèves', icon: ListOrdered },
   { href: '/attendance', label: 'Présences', icon: CalendarCheck2 },
-  { href: '/grades', label: 'Notes et Bulletins', icon: ClipboardList },
+  { href: '/grades', label: 'Saisie Notes', icon: ClipboardList },
+  { href: '/releve-notes', label: 'Relevé Notes', icon: FileText },
   { href: '/learning-material', label: 'Matériel Pédagogique', icon: BookOpen },
 ];
 

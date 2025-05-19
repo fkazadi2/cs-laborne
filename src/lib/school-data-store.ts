@@ -23,7 +23,7 @@ export interface Subject {
 
 export interface StudentGrade {
   studentId: string;
-  classId: string; // Added for potential future filtering/reporting
+  classId: string; 
   subjectId: string;
   grade: number;
 }
@@ -94,6 +94,16 @@ export const addStudentToClass = (classId: string, studentName: string): string 
   return newStudentId;
 };
 
+export const getStudentById = (studentId: string): Student | undefined => {
+  for (const classData of MOCK_CLASSES_STORE) {
+    const student = classData.students.find(s => s.id === studentId);
+    if (student) {
+      return JSON.parse(JSON.stringify(student));
+    }
+  }
+  return undefined;
+};
+
 export const addRegisteredStudentDetails = (details: StudentRegistrationFormValues): void => {
   MOCK_REGISTERED_STUDENTS_DETAILS.push(JSON.parse(JSON.stringify(details)));
   notifyListeners();
@@ -107,9 +117,9 @@ export const setStudentGrade = (classId: string, studentId: string, subjectId: s
   const existingGradeIndex = MOCK_GRADES_STORE.findIndex(
     g => g.studentId === studentId && g.subjectId === subjectId && g.classId === classId
   );
-  if (isNaN(grade)) { // Handle potential NaN if input is cleared or invalid before explicit validation
+  if (isNaN(grade)) { 
     if (existingGradeIndex > -1) {
-      MOCK_GRADES_STORE.splice(existingGradeIndex, 1); // Remove grade if it becomes invalid (e.g. empty input)
+      MOCK_GRADES_STORE.splice(existingGradeIndex, 1); 
     }
   } else {
     if (existingGradeIndex > -1) {
@@ -128,8 +138,12 @@ export const getStudentGrade = (classId: string, studentId: string, subjectId: s
 };
 
 export const getGradesForClassSubject = (classId: string, subjectId: string): StudentGrade[] => {
-    return MOCK_GRADES_STORE.filter(g => g.classId === classId && g.subjectId === subjectId);
+    return JSON.parse(JSON.stringify(MOCK_GRADES_STORE.filter(g => g.classId === classId && g.subjectId === subjectId)));
 }
+
+export const getAllGradesForClass = (classId: string): StudentGrade[] => {
+  return JSON.parse(JSON.stringify(MOCK_GRADES_STORE.filter(g => g.classId === classId)));
+};
 
 
 export const subscribe = (listener: () => void): (() => void) => {

@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, BookOpen, CalendarCheck2, ArrowRight, UserPlus, ClipboardList, ListOrdered } from 'lucide-react';
+import { Users, BookOpen, CalendarCheck2, ArrowRight, UserPlus, ClipboardList, ListOrdered, FileText } from 'lucide-react';
 
 const features = [
   {
@@ -35,9 +35,16 @@ const features = [
   },
   {
     icon: ClipboardList,
-    title: "Gestion des Notes et Bulletins",
-    description: "Encodez les notes par matière, calculez les moyennes et préparez la génération des bulletins PDF.",
+    title: "Saisie des Notes par Classe",
+    description: "Encodez les notes par matière pour une classe entière. Calculez les moyennes et préparez les bulletins.",
     link: '/grades',
+    dataAiHint: 'grade input'
+  },
+  {
+    icon: FileText,
+    title: "Relevé de Notes Détaillé",
+    description: "Consultez un tableau récapitulatif des notes de chaque élève par matière pour une classe donnée.",
+    link: '/releve-notes',
     dataAiHint: 'academic records'
   },
   {
@@ -93,8 +100,9 @@ export default function HomePage() {
                         .replace("d'Information Publique", "")
                         .replace("Simplifiée des Présences", "")
                         .replace("Générateur de ", "")
-                        .replace("Gestion des ", "")
-                        .replace("Liste des ", "") // Added for new feature
+                        .replace("Saisie des ", "") 
+                        .replace("Liste des ", "") 
+                        .replace("Relevé de ", "")
                     }
                     <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
