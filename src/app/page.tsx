@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, BookOpen, CalendarCheck2, ArrowRight, UserPlus, ClipboardList, ListOrdered, FileText } from 'lucide-react';
+import { Users, BookOpen, CalendarCheck2, ArrowRight, UserPlus, ClipboardList, ListOrdered, FileText, FileSpreadsheet } from 'lucide-react';
 
 const features = [
   {
@@ -46,6 +46,13 @@ const features = [
     description: "Consultez un tableau récapitulatif des notes de chaque élève par matière pour une classe donnée.",
     link: '/releve-notes',
     dataAiHint: 'academic records'
+  },
+  {
+    icon: FileSpreadsheet,
+    title: "Génération des Bulletins Scolaires",
+    description: "Préparez et générez (simulation) les bulletins de fin d'année pour chaque élève, par classe.",
+    link: '/bulletins',
+    dataAiHint: 'report cards'
   },
   {
     icon: BookOpen,
@@ -103,6 +110,7 @@ export default function HomePage() {
                         .replace("Saisie des ", "") 
                         .replace("Liste des ", "") 
                         .replace("Relevé de ", "")
+                        .replace("Génération des ", "")
                     }
                     <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
