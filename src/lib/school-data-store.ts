@@ -33,30 +33,30 @@ let MOCK_CLASSES_STORE: ClassData[] = [
     id: 'class_a',
     name: 'Classe A - 10ème Année',
     students: [
-      { id: 's1', name: 'Léa Dubois', attendance: 'not_set' },
-      { id: 's2', name: 'Lucas Martin', attendance: 'not_set' },
-      { id: 's3', name: 'Chloé Bernard', attendance: 'not_set' },
-      { id: 's4', name: 'Hugo Moreau', attendance: 'not_set' },
-      { id: 's5', name: 'Manon Petit', attendance: 'not_set' },
+      { id: 's1', name: 'Tresor Ilunga', attendance: 'not_set' },
+      { id: 's2', name: 'Glody Kazadi', attendance: 'not_set' },
+      { id: 's3', name: 'Esther Mbuyi', attendance: 'not_set' },
+      { id: 's4', name: 'Yannick Mutombo', attendance: 'not_set' },
+      { id: 's5', name: 'Naomi Kalonji', attendance: 'not_set' },
     ],
   },
   {
     id: 'class_b',
     name: 'Classe B - 11ème Année',
     students: [
-      { id: 's6', name: 'Emma Durand', attendance: 'not_set' },
-      { id: 's7', name: 'Gabriel Leroy', attendance: 'not_set' },
-      { id: 's8', name: 'Alice Lefevre', attendance: 'not_set' },
-      { id: 's9', name: 'Adam Roux', attendance: 'not_set' },
+      { id: 's6', name: 'Fiston Ngalula', attendance: 'not_set' },
+      { id: 's7', name: 'Prisca Tshibangu', attendance: 'not_set' },
+      { id: 's8', name: 'Alain Kabongo', attendance: 'not_set' },
+      { id: 's9', name: 'Divine Kasongo', attendance: 'not_set' },
     ],
   },
   {
     id: 'class_c',
     name: 'Classe C - 12ème Année',
     students: [
-      { id: 's10', name: 'Camille Girard', attendance: 'not_set' },
-      { id: 's11', name: 'Jules Lambert', attendance: 'not_set' },
-      { id: 's12', name: 'Inès Bonnet', attendance: 'not_set' },
+      { id: 's10', name: 'Cedrick Lunda', attendance: 'not_set' },
+      { id: 's11', name: 'Gracia Mwamba', attendance: 'not_set' },
+      { id: 's12', name: 'Joel Mukendi', attendance: 'not_set' },
     ],
   }
 ];
