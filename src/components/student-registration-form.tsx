@@ -23,6 +23,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle, Loader2, FileText, UserPlus } from 'lucide-react';
 import { fr } from "date-fns/locale";
+import { addStudentToClass, CLASSES_AVAILABLE_FOR_REGISTRATION } from '@/lib/school-data-store';
 
 const studentRegistrationSchema = z.object({
   nomEleve: z.string().min(2, { message: "Le nom doit contenir au moins 2 caractères." }),
@@ -43,15 +44,6 @@ const studentRegistrationSchema = z.object({
 });
 
 type StudentRegistrationFormValues = z.infer<typeof studentRegistrationSchema>;
-
-const CLASSES_DISPONIBLES = [
-  { id: '7eme', name: '7ème Année Fondamentale' },
-  { id: '8eme', name: '8ème Année Fondamentale' },
-  { id: 'secondaire_1', name: '1ère Année Secondaire' },
-  { id: 'secondaire_2', name: '2ème Année Secondaire (Scientifique/Littéraire)' },
-  { id: 'secondaire_3', name: '3ème Année Secondaire (Scientifique/Littéraire)' },
-  { id: 'secondaire_4', name: '4ème Année Secondaire (Scientifique/Littéraire)' },
-];
 
 export function StudentRegistrationForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -77,12 +69,17 @@ export function StudentRegistrationForm() {
     console.log("Données d'inscription soumises:", data);
 
     // Simuler un appel API
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 1000)); // Reduced timeout for quicker testing
+
+    // Ajouter l'élève au magasin de données partagé
+    const studentFullName = `${data.prenomEleve} ${data.nomEleve}`;
+    addStudentToClass(data.classeSouhaitee, studentFullName);
+
     setIsLoading(false);
 
     toast({
       title: "Inscription Soumise !",
-      description: `La demande d'inscription pour ${data.prenomEleve} ${data.nomEleve} a été soumise avec succès. Nous vous contacterons bientôt.`,
+      description: `La demande d'inscription pour ${studentFullName} dans la classe ${CLASSES_AVAILABLE_FOR_REGISTRATION.find(c => c.id === data.classeSouhaitee)?.name} a été soumise et l'élève ajouté aux listes.`,
       action: <CheckCircle className="text-green-500" />,
     });
     form.reset();
@@ -243,7 +240,7 @@ export function StudentRegistrationForm() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {CLASSES_DISPONIBLES.map((classe) => (
+                      {CLASSES_AVAILABLE_FOR_REGISTRATION.map((classe) => (
                         <SelectItem key={classe.id} value={classe.id}>
                           {classe.name}
                         </SelectItem>

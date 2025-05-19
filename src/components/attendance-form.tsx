@@ -14,18 +14,12 @@ import { useToast } from "@/hooks/use-toast";
 import { AlertTriangle, CheckCircle, Loader2, Save, ListChecks, Users, CalendarDays, Filter } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { format, isSameDay } from 'date-fns';
-import { fr } from 'date-fns/locale'; // Import fr locale for date formatting
+import { fr } from 'date-fns/locale';
+import { getClasses, subscribe, type ClassData, type Student as StoreStudent } from '@/lib/school-data-store';
 
-interface Student {
-  id: string;
-  name: string;
-  attendance: 'present' | 'absent' | 'late' | 'not_set';
-}
-
-interface ClassData {
-  id: string;
-  name: string;
-  students: Student[];
+// Adjusted Student type for this component's specific needs if different from store, or use store's directly
+interface Student extends StoreStudent {
+  // attendance is already in StoreStudent, ensure it's 'not_set' by default for new form instances
 }
 
 interface RecordedAttendance {
@@ -36,43 +30,11 @@ interface RecordedAttendance {
   submissionTime: Date;
 }
 
-const MOCK_CLASSES: ClassData[] = [
-  {
-    id: 'class_a',
-    name: 'Classe A - 10ème Année',
-    students: [
-      { id: 's1', name: 'Léa Dubois', attendance: 'not_set' },
-      { id: 's2', name: 'Lucas Martin', attendance: 'not_set' },
-      { id: 's3', name: 'Chloé Bernard', attendance: 'not_set' },
-      { id: 's4', name: 'Hugo Moreau', attendance: 'not_set' },
-      { id: 's5', name: 'Manon Petit', attendance: 'not_set' },
-    ],
-  },
-  {
-    id: 'class_b',
-    name: 'Classe B - 11ème Année',
-    students: [
-      { id: 's6', name: 'Emma Durand', attendance: 'not_set' },
-      { id: 's7', name: 'Gabriel Leroy', attendance: 'not_set' },
-      { id: 's8', name: 'Alice Lefevre', attendance: 'not_set' },
-      { id: 's9', name: 'Adam Roux', attendance: 'not_set' },
-    ],
-  },
-  {
-    id: 'class_c',
-    name: 'Classe C - 12ème Année',
-    students: [
-      { id: 's10', name: 'Camille Girard', attendance: 'not_set' },
-      { id: 's11', name: 'Jules Lambert', attendance: 'not_set' },
-      { id: 's12', name: 'Inès Bonnet', attendance: 'not_set' },
-    ],
-  }
-];
-
 export function AttendanceForm() {
-  const [selectedClassId, setSelectedClassId] = useState<string | undefined>(MOCK_CLASSES[0]?.id);
+  const [allClasses, setAllClasses] = useState<ClassData[]>(getClasses());
+  const [selectedClassId, setSelectedClassId] = useState<string | undefined>(allClasses[0]?.id);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-  const [students, setStudents] = useState<Student[]>([]);
+  const [studentsForForm, setStudentsForForm] = useState<Student[]>([]); // Renamed to avoid confusion with store's students
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [recordedAttendances, setRecordedAttendances] = useState<RecordedAttendance[]>([]);
   const { toast } = useToast();
@@ -81,26 +43,48 @@ export function AttendanceForm() {
   const [filterClassId, setFilterClassId] = useState<string | undefined>(undefined);
   const [maxCalendarDate, setMaxCalendarDate] = useState<Date | undefined>(undefined);
 
+  useEffect(() => {
+    const unsubscribe = subscribe(() => {
+      const updatedClasses = getClasses();
+      setAllClasses(updatedClasses);
+      // If the currently selected class still exists, refresh its student list
+      // Otherwise, reset selection or select the first available class
+      const currentSelectedClassStillExists = updatedClasses.find(c => c.id === selectedClassId);
+      if (!currentSelectedClassStillExists && updatedClasses.length > 0) {
+        setSelectedClassId(updatedClasses[0].id);
+      } else if (!currentSelectedClassStillExists && updatedClasses.length === 0) {
+        setSelectedClassId(undefined);
+      }
+      // This will trigger the other useEffect that depends on selectedClassId or allClasses
+    });
+    return () => unsubscribe();
+  }, [selectedClassId]); // Add selectedClassId to re-evaluate if it needs to change
 
-  const currentClass = useMemo(() => MOCK_CLASSES.find(c => c.id === selectedClassId), [selectedClassId]);
+  const currentClass = useMemo(() => allClasses.find(c => c.id === selectedClassId), [selectedClassId, allClasses]);
 
   useEffect(() => {
     const today = new Date();
-    setSelectedDate(today);
-    setFilterDate(today); 
+    if (!selectedDate) { // Only set initial date once
+        setSelectedDate(today);
+    }
+    if (!filterDate) {
+        setFilterDate(today);
+    }
     setMaxCalendarDate(today);
-  }, []);
+  }, [selectedDate, filterDate]);
+
 
   useEffect(() => {
     if (currentClass) {
-      setStudents(currentClass.students.map(s => ({ ...s, attendance: 'not_set' })));
+      // Ensure attendance is initialized to 'not_set' for the form
+      setStudentsForForm(currentClass.students.map(s => ({ ...s, attendance: s.attendance || 'not_set' })));
     } else {
-      setStudents([]);
+      setStudentsForForm([]);
     }
-  }, [selectedClassId, currentClass]);
+  }, [selectedClassId, currentClass, allClasses]); // Add allClasses to dependencies
 
   const handleAttendanceChange = (studentId: string, value: Student['attendance']) => {
-    setStudents((prevStudents) =>
+    setStudentsForForm((prevStudents) =>
       prevStudents.map((student) =>
         student.id === studentId ? { ...student, attendance: value } : student
       )
@@ -126,7 +110,7 @@ export function AttendanceForm() {
       id: `rec_${Date.now()}`,
       classInfo: { id: currentClass.id, name: currentClass.name },
       date: selectedDate,
-      students: JSON.parse(JSON.stringify(students)), // Deep copy
+      students: JSON.parse(JSON.stringify(studentsForForm)), 
       submissionTime: new Date(),
     };
     console.log("Données de présence enregistrées localement:", newRecord);
@@ -168,44 +152,38 @@ export function AttendanceForm() {
   }, [recordedAttendances, filterDate, filterClassId]);
 
 
-  if (!currentClass && MOCK_CLASSES.length > 0 && !selectedClassId) {
+  if (allClasses.length === 0) {
     return (
       <Card className="shadow-lg rounded-lg">
         <CardHeader>
           <CardTitle className="text-2xl text-primary">Saisie des Présences</CardTitle>
-          <CardDescription>Sélectionnez une classe pour commencer.</CardDescription>
         </CardHeader>
         <CardContent>
-          <Select onValueChange={setSelectedClassId} defaultValue={selectedClassId}>
-            <SelectTrigger className="w-full md:w-[300px]">
-              <SelectValue placeholder="Sélectionnez une classe" />
-            </SelectTrigger>
-            <SelectContent>
-              {MOCK_CLASSES.map((cls) => (
-                <SelectItem key={cls.id} value={cls.id}>
-                  {cls.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {MOCK_CLASSES.length === 0 && <p className="mt-4 text-muted-foreground">Aucune classe disponible.</p>}
+           <p className="mt-4 text-muted-foreground">Aucune classe disponible pour le moment. Veuillez en créer ou en ajouter.</p>
         </CardContent>
       </Card>
     );
   }
   
-  if (MOCK_CLASSES.length === 0) {
+  if (!currentClass && allClasses.length > 0 && !selectedClassId) {
+      // If no class is selected yet, but classes are available, prompt selection or default to first.
+      // This effect ensures a class is selected if available.
+      if (allClasses.length > 0 && !selectedClassId) {
+          setSelectedClassId(allClasses[0].id); 
+      }
     return (
       <Card className="shadow-lg rounded-lg">
         <CardHeader>
           <CardTitle className="text-2xl text-primary">Saisie des Présences</CardTitle>
+          <CardDescription>Chargement des classes...</CardDescription>
         </CardHeader>
         <CardContent>
-           <p className="mt-4 text-muted-foreground">Aucune classe disponible pour le moment.</p>
+            <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
         </CardContent>
       </Card>
     );
   }
+
 
   return (
     <>
@@ -221,12 +199,16 @@ export function AttendanceForm() {
             <div className="grid md:grid-cols-2 gap-4 items-end">
               <div>
                 <Label htmlFor="class-select" className="mb-2 block font-medium">Classe</Label>
-                <Select onValueChange={setSelectedClassId} value={selectedClassId || ''} disabled={isLoading}>
+                <Select 
+                  onValueChange={setSelectedClassId} 
+                  value={selectedClassId || ''} 
+                  disabled={isLoading || allClasses.length === 0}
+                >
                   <SelectTrigger id="class-select" className="w-full">
                     <SelectValue placeholder="Sélectionnez une classe" />
                   </SelectTrigger>
                   <SelectContent>
-                    {MOCK_CLASSES.map((cls) => (
+                    {allClasses.map((cls) => (
                       <SelectItem key={cls.id} value={cls.id}>
                         {cls.name}
                       </SelectItem>
@@ -240,12 +222,12 @@ export function AttendanceForm() {
                   date={selectedDate} 
                   setDate={setSelectedDate} 
                   buttonProps={{id:"date-picker", disabled:isLoading || !selectedDate}}
-                  calendarProps={{ disabled: maxCalendarDate ? (date) => date > maxCalendarDate : () => false }}
+                  calendarProps={{ disabled: (date) => maxCalendarDate ? date > maxCalendarDate : false }}
                 />
               </div>
             </div>
 
-            {students.length > 0 && selectedDate ? (
+            {studentsForForm.length > 0 && selectedDate ? (
               <div className="overflow-x-auto rounded-md border">
                 <Table>
                   <TableHeader>
@@ -255,7 +237,7 @@ export function AttendanceForm() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {students.map((student) => (
+                    {studentsForForm.map((student) => (
                       <TableRow key={student.id}>
                         <TableCell className="py-3">{student.name}</TableCell>
                         <TableCell className="py-3 text-center">
@@ -286,12 +268,12 @@ export function AttendanceForm() {
               </div>
             ) : (
               <p className="text-muted-foreground text-center py-4">
-                { !selectedDate ? "Chargement de la date..." : "Aucun élève trouvé pour cette classe, ou classe non sélectionnée."}
+                { !selectedDate ? "Chargement de la date..." : (currentClass && currentClass.students.length === 0 ? "Aucun élève dans cette classe." : "Sélectionnez une classe pour voir les élèves.")}
               </p>
             )}
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={isLoading || students.length === 0 || !selectedDate} className="w-full md:w-auto">
+            <Button type="submit" disabled={isLoading || studentsForForm.length === 0 || !selectedDate} className="w-full md:w-auto">
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -329,7 +311,7 @@ export function AttendanceForm() {
                             setDate={(date) => setFilterDate(date)} 
                             placeholder="Toutes les dates"
                             buttonProps={{id:"filter-date-picker", variant: "outline"}}
-                            calendarProps={{ disabled: maxCalendarDate ? (date) => date > maxCalendarDate : () => false }}
+                            calendarProps={{ disabled: (date) => maxCalendarDate ? date > maxCalendarDate : false }}
                          />
                     </div>
                     <div>
@@ -340,7 +322,7 @@ export function AttendanceForm() {
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="all">Toutes les classes</SelectItem>
-                                {MOCK_CLASSES.map((cls) => (
+                                {allClasses.map((cls) => (
                                 <SelectItem key={cls.id} value={cls.id}>
                                     {cls.name}
                                 </SelectItem>
