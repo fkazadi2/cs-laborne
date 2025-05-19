@@ -1,3 +1,4 @@
+
 // src/components/attendance-form.tsx
 "use client";
 
@@ -27,32 +28,32 @@ interface ClassData {
 const MOCK_CLASSES: ClassData[] = [
   {
     id: 'class_a',
-    name: 'Class A - Grade 10',
+    name: 'Classe A - 10ème Année',
     students: [
-      { id: 's1', name: 'Aisha Diallo', attendance: 'not_set' },
-      { id: 's2', name: 'Kwame Nkosi', attendance: 'not_set' },
-      { id: 's3', name: 'Fatoumata Traoré', attendance: 'not_set' },
-      { id: 's4', name: 'Moussa Diop', attendance: 'not_set' },
-      { id: 's5', name: 'Chinedu Eze', attendance: 'not_set' },
+      { id: 's1', name: 'Léa Dubois', attendance: 'not_set' },
+      { id: 's2', name: 'Lucas Martin', attendance: 'not_set' },
+      { id: 's3', name: 'Chloé Bernard', attendance: 'not_set' },
+      { id: 's4', name: 'Hugo Moreau', attendance: 'not_set' },
+      { id: 's5', name: 'Manon Petit', attendance: 'not_set' },
     ],
   },
   {
     id: 'class_b',
-    name: 'Class B - Grade 11',
+    name: 'Classe B - 11ème Année',
     students: [
-      { id: 's6', name: 'Zola Adebayo', attendance: 'not_set' },
-      { id: 's7', name: 'Thabo Molefe', attendance: 'not_set' },
-      { id: 's8', name: 'Imani Okoro', attendance: 'not_set' },
-      { id: 's9', name: 'Jean-Luc Dubois', attendance: 'not_set' },
+      { id: 's6', name: 'Emma Durand', attendance: 'not_set' },
+      { id: 's7', name: 'Gabriel Leroy', attendance: 'not_set' },
+      { id: 's8', name: 'Alice Lefevre', attendance: 'not_set' },
+      { id: 's9', name: 'Adam Roux', attendance: 'not_set' },
     ],
   },
   {
     id: 'class_c',
-    name: 'Class C - Grade 12',
+    name: 'Classe C - 12ème Année',
     students: [
-      { id: 's10', name: 'Mariam Kone', attendance: 'not_set' },
-      { id: 's11', name: 'David Kante', attendance: 'not_set' },
-      { id: 's12', name: 'Nia Adekunle', attendance: 'not_set' },
+      { id: 's10', name: 'Camille Girard', attendance: 'not_set' },
+      { id: 's11', name: 'Jules Lambert', attendance: 'not_set' },
+      { id: 's12', name: 'Inès Bonnet', attendance: 'not_set' },
     ],
   }
 ];
@@ -68,8 +69,6 @@ export function AttendanceForm() {
 
   useEffect(() => {
     if (currentClass) {
-      // In a real app, you'd fetch attendance for selectedClassId and selectedDate
-      // For now, just reset students from mock data for the selected class
       setStudents(currentClass.students.map(s => ({ ...s, attendance: 'not_set' })));
     } else {
       setStudents([]);
@@ -90,44 +89,43 @@ export function AttendanceForm() {
     if (!selectedClassId || !selectedDate) {
       toast({
         variant: "destructive",
-        title: "Missing Information",
-        description: "Please select a class and a date.",
+        title: "Informations Manquantes",
+        description: "Veuillez sélectionner une classe et une date.",
         action: <AlertTriangle className="text-red-500" />,
       });
       return;
     }
 
     setIsLoading(true);
-    // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));
     setIsLoading(false);
 
-    console.log('Attendance Data:', {
+    console.log('Données de présence :', {
       classId: selectedClassId,
       date: selectedDate,
       attendance: students,
     });
 
     toast({
-      title: "Attendance Saved!",
-      description: `Attendance for ${currentClass?.name} on ${selectedDate.toLocaleDateString()} has been recorded.`,
+      title: "Présences Enregistrées !",
+      description: `Les présences pour ${currentClass?.name} le ${selectedDate.toLocaleDateString('fr-FR')} ont été enregistrées.`,
       action: <CheckCircle className="text-green-500" />,
     });
   };
 
-  if (!currentClass) {
-     // This handles the initial render case if MOCK_CLASSES[0] is undefined (e.g. empty MOCK_CLASSES)
-     // or if selectedClassId somehow becomes invalid.
+  if (!currentClass && MOCK_CLASSES.length > 0) {
+    // This handles the initial render case if MOCK_CLASSES[0] is undefined (e.g. empty MOCK_CLASSES)
+    // or if selectedClassId somehow becomes invalid.
     return (
       <Card className="shadow-lg rounded-lg">
         <CardHeader>
-          <CardTitle className="text-2xl text-primary">Attendance Input</CardTitle>
-          <CardDescription>Select a class to begin.</CardDescription>
+          <CardTitle className="text-2xl text-primary">Saisie des Présences</CardTitle>
+          <CardDescription>Sélectionnez une classe pour commencer.</CardDescription>
         </CardHeader>
         <CardContent>
           <Select onValueChange={setSelectedClassId} defaultValue={selectedClassId}>
             <SelectTrigger className="w-full md:w-[300px]">
-              <SelectValue placeholder="Select a class" />
+              <SelectValue placeholder="Sélectionnez une classe" />
             </SelectTrigger>
             <SelectContent>
               {MOCK_CLASSES.map((cls) => (
@@ -137,7 +135,20 @@ export function AttendanceForm() {
               ))}
             </SelectContent>
           </Select>
-          {MOCK_CLASSES.length === 0 && <p className="mt-4 text-muted-foreground">No classes available.</p>}
+          {MOCK_CLASSES.length === 0 && <p className="mt-4 text-muted-foreground">Aucune classe disponible.</p>}
+        </CardContent>
+      </Card>
+    );
+  }
+  
+  if (MOCK_CLASSES.length === 0) {
+    return (
+      <Card className="shadow-lg rounded-lg">
+        <CardHeader>
+          <CardTitle className="text-2xl text-primary">Saisie des Présences</CardTitle>
+        </CardHeader>
+        <CardContent>
+           <p className="mt-4 text-muted-foreground">Aucune classe disponible pour le moment.</p>
         </CardContent>
       </Card>
     );
@@ -148,18 +159,18 @@ export function AttendanceForm() {
     <Card className="shadow-lg rounded-lg">
       <form onSubmit={handleSubmit}>
         <CardHeader>
-          <CardTitle className="text-2xl text-primary">Record Attendance</CardTitle>
+          <CardTitle className="text-2xl text-primary">Enregistrer les Présences</CardTitle>
           <CardDescription>
-            Select a class and date, then mark attendance for each student.
+            Sélectionnez une classe et une date, puis marquez la présence de chaque élève.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid md:grid-cols-2 gap-4 items-end">
             <div>
-              <Label htmlFor="class-select" className="mb-2 block font-medium">Class</Label>
+              <Label htmlFor="class-select" className="mb-2 block font-medium">Classe</Label>
               <Select onValueChange={setSelectedClassId} defaultValue={selectedClassId} disabled={isLoading}>
                 <SelectTrigger id="class-select" className="w-full">
-                  <SelectValue placeholder="Select a class" />
+                  <SelectValue placeholder="Sélectionnez une classe" />
                 </SelectTrigger>
                 <SelectContent>
                   {MOCK_CLASSES.map((cls) => (
@@ -181,8 +192,8 @@ export function AttendanceForm() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="font-semibold">Student Name</TableHead>
-                    <TableHead className="font-semibold text-center w-[350px]">Status</TableHead>
+                    <TableHead className="font-semibold">Nom de l'Élève</TableHead>
+                    <TableHead className="font-semibold text-center w-[350px]">Statut</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -198,15 +209,15 @@ export function AttendanceForm() {
                         >
                           <div className="flex items-center space-x-1">
                             <RadioGroupItem value="present" id={`${student.id}-present`} />
-                            <Label htmlFor={`${student.id}-present`} className="cursor-pointer">Present</Label>
+                            <Label htmlFor={`${student.id}-present`} className="cursor-pointer">Présent(e)</Label>
                           </div>
                           <div className="flex items-center space-x-1">
                             <RadioGroupItem value="absent" id={`${student.id}-absent`} />
-                            <Label htmlFor={`${student.id}-absent`} className="cursor-pointer">Absent</Label>
+                            <Label htmlFor={`${student.id}-absent`} className="cursor-pointer">Absent(e)</Label>
                           </div>
                           <div className="flex items-center space-x-1">
                             <RadioGroupItem value="late" id={`${student.id}-late`} />
-                            <Label htmlFor={`${student.id}-late`} className="cursor-pointer">Late</Label>
+                            <Label htmlFor={`${student.id}-late`} className="cursor-pointer">En Retard</Label>
                           </div>
                         </RadioGroup>
                       </TableCell>
@@ -217,7 +228,7 @@ export function AttendanceForm() {
             </div>
           ) : (
             <p className="text-muted-foreground text-center py-4">
-              No students found for this class, or class not selected.
+              Aucun élève trouvé pour cette classe, ou classe non sélectionnée.
             </p>
           )}
         </CardContent>
@@ -226,12 +237,12 @@ export function AttendanceForm() {
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Saving...
+                Enregistrement...
               </>
             ) : (
               <>
                 <Save className="mr-2 h-4 w-4" />
-                Save Attendance
+                Enregistrer les Présences
               </>
             )}
           </Button>

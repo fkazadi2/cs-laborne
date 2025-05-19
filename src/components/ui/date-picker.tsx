@@ -1,8 +1,10 @@
+
 // src/components/ui/date-picker.tsx
 "use client"
 
 import * as React from "react"
 import { format } from "date-fns"
+import { fr } from "date-fns/locale" // Import French locale for date formatting
 import { Calendar as CalendarIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -17,12 +19,12 @@ import {
 interface DatePickerProps {
   date: Date | undefined;
   setDate: (date: Date | undefined) => void;
-  calendarProps?: Omit<CalendarProps, 'mode' | 'selected' | 'onSelect'>;
+  calendarProps?: Omit<CalendarProps, 'mode' | 'selected' | 'onSelect' | 'locale'>;
   buttonProps?: React.ComponentProps<typeof Button>;
   placeholder?: string;
 }
 
-export function DatePicker({ date, setDate, calendarProps, buttonProps, placeholder = "Pick a date" }: DatePickerProps) {
+export function DatePicker({ date, setDate, calendarProps, buttonProps, placeholder = "Choisissez une date" }: DatePickerProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -35,7 +37,7 @@ export function DatePicker({ date, setDate, calendarProps, buttonProps, placehol
           {...buttonProps}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, "PPP") : <span>{placeholder}</span>}
+          {date ? format(date, "PPP", { locale: fr }) : <span>{placeholder}</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">
@@ -44,6 +46,7 @@ export function DatePicker({ date, setDate, calendarProps, buttonProps, placehol
           selected={date}
           onSelect={setDate}
           initialFocus
+          locale={fr} // Pass French locale to Calendar
           {...calendarProps}
         />
       </PopoverContent>

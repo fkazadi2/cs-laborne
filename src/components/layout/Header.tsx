@@ -1,3 +1,4 @@
+
 // src/components/layout/Header.tsx
 "use client";
 
@@ -8,10 +9,10 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
 const navItems = [
-  { href: '/', label: 'Home', icon: Home },
-  { href: '/public', label: 'Public Portal', icon: Users },
-  { href: '/learning-material', label: 'Learning Material', icon: BookOpen },
-  { href: '/attendance', label: 'Attendance', icon: CalendarCheck2 },
+  { href: '/', label: 'Accueil', icon: Home },
+  { href: '/public', label: 'Portail Public', icon: Users },
+  { href: '/learning-material', label: 'Matériel Pédagogique', icon: BookOpen },
+  { href: '/attendance', label: 'Présences', icon: CalendarCheck2 },
 ];
 
 export function Header() {

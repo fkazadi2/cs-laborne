@@ -1,3 +1,4 @@
+
 // src/components/learning-material-form.tsx
 "use client";
 
@@ -22,7 +23,7 @@ export function LearningMaterialGeneratorForm() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!lessonContent.trim()) {
-      setError("Lesson content cannot be empty.");
+      setError("Le contenu de la leçon ne peut pas être vide.");
       return;
     }
     setIsLoading(true);
@@ -33,17 +34,17 @@ export function LearningMaterialGeneratorForm() {
       const result = await generateLearningMaterial({ lessonContent });
       setGeneratedMaterial(result);
       toast({
-        title: "Success!",
-        description: "Learning materials generated.",
+        title: "Succès !",
+        description: "Matériel pédagogique généré.",
         action: <CheckCircle className="text-green-500" />,
       });
     } catch (e) {
-      console.error("Error generating learning material:", e);
-      const errorMessage = e instanceof Error ? e.message : "An unknown error occurred.";
-      setError(`Failed to generate learning materials: ${errorMessage}`);
+      console.error("Erreur lors de la génération du matériel pédagogique:", e);
+      const errorMessage = e instanceof Error ? e.message : "Une erreur inconnue s'est produite.";
+      setError(`Échec de la génération du matériel pédagogique : ${errorMessage}`);
       toast({
         variant: "destructive",
-        title: "Error Generating Materials",
+        title: "Erreur lors de la Génération du Matériel",
         description: errorMessage,
         action: <AlertTriangle className="text-red-500" />,
       });
@@ -56,15 +57,15 @@ export function LearningMaterialGeneratorForm() {
     <div className="space-y-8">
       <Card className="shadow-lg rounded-lg">
         <CardHeader>
-          <CardTitle className="text-2xl text-primary">Lesson Content Input</CardTitle>
+          <CardTitle className="text-2xl text-primary">Saisie du Contenu de la Leçon</CardTitle>
           <CardDescription>
-            Paste your lesson content below. The AI will generate flashcards and practice questions based on it.
+            Collez le contenu de votre leçon ci-dessous. L'IA générera des fiches de révision et des questions pratiques basées sur celui-ci.
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent>
             <Textarea
-              placeholder="Enter your lesson material here..."
+              placeholder="Entrez le contenu de votre leçon ici..."
               value={lessonContent}
               onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setLessonContent(e.target.value)}
               rows={10}
@@ -74,7 +75,7 @@ export function LearningMaterialGeneratorForm() {
             {error && (
               <Alert variant="destructive" className="mt-4">
                 <AlertTriangle className="h-4 w-4" />
-                <AlertTitle>Error</AlertTitle>
+                <AlertTitle>Erreur</AlertTitle>
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
@@ -84,12 +85,12 @@ export function LearningMaterialGeneratorForm() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Generating...
+                  Génération en cours...
                 </>
               ) : (
                 <>
                   <Sparkles className="mr-2 h-4 w-4" />
-                  Generate Materials
+                  Générer le Matériel
                 </>
               )}
             </Button>
@@ -101,7 +102,7 @@ export function LearningMaterialGeneratorForm() {
         <div className="space-y-8 mt-8">
           <Card className="shadow-lg rounded-lg">
             <CardHeader>
-              <CardTitle className="text-2xl text-primary">Generated Flashcards</CardTitle>
+              <CardTitle className="text-2xl text-primary">Fiches de Révision Générées</CardTitle>
             </CardHeader>
             <CardContent>
               {generatedMaterial.flashcards.length > 0 ? (
@@ -111,14 +112,14 @@ export function LearningMaterialGeneratorForm() {
                   ))}
                 </ul>
               ) : (
-                <p className="text-muted-foreground">No flashcards generated.</p>
+                <p className="text-muted-foreground">Aucune fiche de révision générée.</p>
               )}
             </CardContent>
           </Card>
 
           <Card className="shadow-lg rounded-lg">
             <CardHeader>
-              <CardTitle className="text-2xl text-primary">Generated Practice Questions</CardTitle>
+              <CardTitle className="text-2xl text-primary">Questions Pratiques Générées</CardTitle>
             </CardHeader>
             <CardContent>
               {generatedMaterial.practiceQuestions.length > 0 ? (
@@ -128,7 +129,7 @@ export function LearningMaterialGeneratorForm() {
                   ))}
                 </ol>
               ) : (
-                <p className="text-muted-foreground">No practice questions generated.</p>
+                <p className="text-muted-foreground">Aucune question pratique générée.</p>
               )}
             </CardContent>
           </Card>

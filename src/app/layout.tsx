@@ -1,3 +1,4 @@
+
 import type {Metadata} from 'next';
 import { Geist, Geist_Mono } from 'next/font/google'; // Corrected font import
 import './globals.css';
@@ -15,7 +16,7 @@ const geistMono = Geist_Mono({ // Corrected usage
 
 export const metadata: Metadata = {
   title: 'La Borne Connect',
-  description: 'School Management System for C.S. La Borne',
+  description: 'Système de Gestion Scolaire pour C.S. La Borne',
 };
 
 export default function RootLayout({
@@ -24,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="fr">
       <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}>
         <AppLayout>
           {children}
