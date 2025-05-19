@@ -2,6 +2,10 @@
 // src/lib/school-data-store.ts
 "use client";
 
+// Import StudentRegistrationFormValues from the form component itself
+// This assumes StudentRegistrationFormValues is exported from student-registration-form.tsx
+import type { StudentRegistrationFormValues } from '@/components/student-registration-form';
+
 export interface Student {
   id: string;
   name: string;
@@ -59,6 +63,9 @@ export const MOCK_SUBJECTS_STORE: Subject[] = [
   { id: 'history', name: 'Histoire' },
 ];
 
+// Store for detailed student registrations
+let MOCK_REGISTERED_STUDENTS_DETAILS: StudentRegistrationFormValues[] = [];
+
 let listeners: (() => void)[] = [];
 
 export const getClasses = (): ClassData[] => {
@@ -69,16 +76,28 @@ export const getSubjects = (): Subject[] => {
   return JSON.parse(JSON.stringify(MOCK_SUBJECTS_STORE)); // Return a deep copy
 }
 
-export const addStudentToClass = (classId: string, studentName: string): void => {
+export const addStudentToClass = (classId: string, studentName: string): string => {
   const classObj = MOCK_CLASSES_STORE.find(c => c.id === classId);
+  const newStudentId = `s_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
   if (classObj) {
-    const newStudentId = `s_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     classObj.students.push({ id: newStudentId, name: studentName, attendance: 'not_set' });
     notifyListeners();
   } else {
     console.warn(`Classe avec ID ${classId} non trouvée dans le magasin.`);
   }
+  return newStudentId; // Return the new student ID
 };
+
+// Functions for detailed student registrations
+export const addRegisteredStudentDetails = (details: StudentRegistrationFormValues): void => {
+  MOCK_REGISTERED_STUDENTS_DETAILS.push(JSON.parse(JSON.stringify(details))); // Store a deep copy
+  notifyListeners();
+};
+
+export const getRegisteredStudentDetails = (): StudentRegistrationFormValues[] => {
+  return JSON.parse(JSON.stringify(MOCK_REGISTERED_STUDENTS_DETAILS)); // Return a deep copy
+};
+
 
 export const subscribe = (listener: () => void): (() => void) => {
   listeners.push(listener);

@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, BookOpen, CalendarCheck2, ArrowRight, UserPlus, ClipboardList } from 'lucide-react'; // Ajout de ClipboardList
+import { Users, BookOpen, CalendarCheck2, ArrowRight, UserPlus, ClipboardList, ListOrdered } from 'lucide-react';
 
 const features = [
   {
@@ -20,6 +20,13 @@ const features = [
     dataAiHint: 'student enrollment'
   },
   {
+    icon: ListOrdered,
+    title: "Liste des Élèves Inscrits",
+    description: "Consultez et gérez la liste des élèves inscrits avec leurs informations détaillées.",
+    link: '/liste-eleves',
+    dataAiHint: 'student database'
+  },
+  {
     icon: CalendarCheck2,
     title: 'Saisie Simplifiée des Présences',
     description: "Une interface facile à utiliser pour que les enseignants puissent rapidement marquer les présences des élèves.",
@@ -27,11 +34,11 @@ const features = [
     dataAiHint: 'classroom management'
   },
   {
-    icon: ClipboardList, // Nouvelle icône
-    title: "Gestion des Notes et Bulletins", // Nouveau titre
-    description: "Encodez les notes par matière, calculez les moyennes et préparez la génération des bulletins PDF.", // Nouvelle description
-    link: '/grades', // Nouveau lien
-    dataAiHint: 'academic records' // Nouveau hint
+    icon: ClipboardList,
+    title: "Gestion des Notes et Bulletins",
+    description: "Encodez les notes par matière, calculez les moyennes et préparez la génération des bulletins PDF.",
+    link: '/grades',
+    dataAiHint: 'academic records'
   },
   {
     icon: BookOpen,
@@ -81,7 +88,14 @@ export default function HomePage() {
               <div className="p-6 pt-0 mt-auto">
                 <Button variant="outline" asChild className="w-full group">
                   <Link href={feature.link}>
-                    Aller à {feature.title.replace("des Élèves", "").replace("d'Information Publique", "").replace("Simplifiée des Présences", "").replace("Générateur de ", "").replace("Gestion des ", "")}
+                    Aller à {feature.title
+                        .replace("des Élèves", "")
+                        .replace("d'Information Publique", "")
+                        .replace("Simplifiée des Présences", "")
+                        .replace("Générateur de ", "")
+                        .replace("Gestion des ", "")
+                        .replace("Liste des ", "") // Added for new feature
+                    }
                     <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </Button>

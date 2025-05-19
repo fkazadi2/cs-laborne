@@ -23,9 +23,12 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle, Loader2, FileText, UserPlus } from 'lucide-react';
 import { fr } from "date-fns/locale";
-import { addStudentToClass, CLASSES_AVAILABLE_FOR_REGISTRATION } from '@/lib/school-data-store';
+import { addStudentToClass, addRegisteredStudentDetails, CLASSES_AVAILABLE_FOR_REGISTRATION } from '@/lib/school-data-store';
 
-const studentRegistrationSchema = z.object({
+// Exporting the schema and type for use in school-data-store.ts
+export const studentRegistrationSchema = z.object({
+  // Adding an ID field that will be generated upon submission for the detailed list
+  id: z.string().optional(), 
   nomEleve: z.string().min(2, { message: "Le nom doit contenir au moins 2 caractères." }),
   prenomEleve: z.string().min(2, { message: "Le prénom doit contenir au moins 2 caractères." }),
   dateNaissance: z.date({ required_error: "La date de naissance est requise." }),
@@ -43,7 +46,7 @@ const studentRegistrationSchema = z.object({
     .optional(),
 });
 
-type StudentRegistrationFormValues = z.infer<typeof studentRegistrationSchema>;
+export type StudentRegistrationFormValues = z.infer<typeof studentRegistrationSchema>;
 
 export function StudentRegistrationForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -66,20 +69,33 @@ export function StudentRegistrationForm() {
 
   async function onSubmit(data: StudentRegistrationFormValues) {
     setIsLoading(true);
-    console.log("Données d'inscription soumises:", data);
-
-    // Simuler un appel API
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Reduced timeout for quicker testing
-
-    // Ajouter l'élève au magasin de données partagé
+    
+    // Generate a unique ID for this registration entry and for the student in the class list
+    const uniqueId = `reg_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
     const studentFullName = `${data.prenomEleve} ${data.nomEleve}`;
-    addStudentToClass(data.classeSouhaitee, studentFullName);
 
+    // Add student to class roster (this function in store now returns the student's ID in the class)
+    // We'll use the same uniqueId for consistency, though the store might generate its own internal student ID.
+    // For simplicity now, let's assume addStudentToClass uses a similar ID generation or we can pass it.
+    // The current addStudentToClass in store generates its own 's_...' ID. We'll use that.
+    const studentIdInClass = addStudentToClass(data.classeSouhaitee, studentFullName);
+
+    // Prepare the data for the detailed registration store, including the ID
+    const registrationDetails: StudentRegistrationFormValues = {
+      ...data,
+      id: uniqueId, // This ID is for the registration entry itself.
+    };
+
+    addRegisteredStudentDetails(registrationDetails);
+    console.log("Données d'inscription soumises et enregistrées dans le magasin:", registrationDetails);
+
+
+    await new Promise(resolve => setTimeout(resolve, 200)); 
     setIsLoading(false);
 
     toast({
       title: "Inscription Soumise !",
-      description: `La demande d'inscription pour ${studentFullName} dans la classe ${CLASSES_AVAILABLE_FOR_REGISTRATION.find(c => c.id === data.classeSouhaitee)?.name} a été soumise et l'élève ajouté aux listes.`,
+      description: `La demande d'inscription pour ${studentFullName} dans la classe ${CLASSES_AVAILABLE_FOR_REGISTRATION.find(c => c.id === data.classeSouhaitee)?.name} a été enregistrée.`,
       action: <CheckCircle className="text-green-500" />,
     });
     form.reset();
@@ -321,3 +337,4 @@ export function StudentRegistrationForm() {
     </Card>
   );
 }
+

@@ -3,7 +3,7 @@
 "use client";
 
 import Link from 'next/link';
-import { BookOpen, Edit3, Home, Users, CalendarCheck2, UserPlus, ClipboardList } from 'lucide-react'; // Ajout de ClipboardList
+import { BookOpen, Edit3, Home, Users, CalendarCheck2, UserPlus, ClipboardList, ListOrdered } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -12,8 +12,9 @@ const navItems = [
   { href: '/', label: 'Accueil', icon: Home },
   { href: '/public', label: 'Portail Public', icon: Users },
   { href: '/inscription-eleve', label: 'Inscriptions', icon: UserPlus },
+  { href: '/liste-eleves', label: 'Liste Élèves', icon: ListOrdered },
   { href: '/attendance', label: 'Présences', icon: CalendarCheck2 },
-  { href: '/grades', label: 'Notes et Bulletins', icon: ClipboardList }, // Ajout du lien Notes et Bulletins
+  { href: '/grades', label: 'Notes et Bulletins', icon: ClipboardList },
   { href: '/learning-material', label: 'Matériel Pédagogique', icon: BookOpen },
 ];
 
@@ -37,11 +38,11 @@ export function Header() {
                 variant={pathname === item.href ? 'default' : 'ghost'}
                 asChild
                 className={cn(
-                  "font-medium px-2.5 py-2 text-xs lg:text-sm", // Ajustement de la taille pour plus d'items
+                  "font-medium px-2 py-2 text-xs lg:text-sm", // Ajustement de la taille pour plus d'items
                   pathname === item.href ? "text-primary-foreground" : "text-foreground hover:text-primary"
                 )}
               >
-                <Link href={item.href} className="flex items-center gap-1.5 lg:gap-2">
+                <Link href={item.href} className="flex items-center gap-1 lg:gap-1.5"> {/* Reduced gap for smaller screens */}
                   <item.icon className="h-3.5 w-3.5 lg:h-4 lg:w-4" />
                   {item.label}
                 </Link>
