@@ -3,7 +3,7 @@
 "use client";
 
 import Link from 'next/link';
-import { BookOpen, Edit3, Home, Users, CalendarCheck2 } from 'lucide-react';
+import { BookOpen, Edit3, Home, Users, CalendarCheck2, UserPlus } from 'lucide-react'; // Ajout de UserPlus
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 const navItems = [
   { href: '/', label: 'Accueil', icon: Home },
   { href: '/public', label: 'Portail Public', icon: Users },
+  { href: '/inscription-eleve', label: 'Inscriptions', icon: UserPlus }, // Ajout du lien Inscriptions
   { href: '/learning-material', label: 'Matériel Pédagogique', icon: BookOpen },
   { href: '/attendance', label: 'Présences', icon: CalendarCheck2 },
 ];
@@ -28,14 +29,14 @@ export function Header() {
               <span>La Borne Connect</span>
             </Link>
           </div>
-          <nav className="hidden md:flex space-x-2 lg:space-x-4">
+          <nav className="hidden md:flex space-x-1 lg:space-x-2"> {/* Adjusted spacing for more items */}
             {navItems.map((item) => (
               <Button
                 key={item.label}
                 variant={pathname === item.href ? 'default' : 'ghost'}
                 asChild
                 className={cn(
-                  "font-medium",
+                  "font-medium px-3 py-2 text-sm", // Ajustement de la taille pour plus d'items
                   pathname === item.href ? "text-primary-foreground" : "text-foreground hover:text-primary"
                 )}
               >
