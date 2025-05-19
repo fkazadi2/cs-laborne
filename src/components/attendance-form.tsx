@@ -11,8 +11,9 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { DatePicker } from '@/components/ui/date-picker';
 import { useToast } from "@/hooks/use-toast";
-import { AlertTriangle, CheckCircle, Loader2, Save, ListChecks, Users, CalendarDays } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Loader2, Save, ListChecks, Users, CalendarDays, Filter } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { format, isSameDay } from 'date-fns';
 
 interface Student {
   id: string;
@@ -69,23 +70,25 @@ const MOCK_CLASSES: ClassData[] = [
 
 export function AttendanceForm() {
   const [selectedClassId, setSelectedClassId] = useState<string | undefined>(MOCK_CLASSES[0]?.id);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined); // Initialize to undefined
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [students, setStudents] = useState<Student[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [recordedAttendances, setRecordedAttendances] = useState<RecordedAttendance[]>([]);
   const { toast } = useToast();
 
+  // State for history filters
+  const [filterDate, setFilterDate] = useState<Date | undefined>(undefined);
+  const [filterClassId, setFilterClassId] = useState<string | undefined>(undefined); // undefined means "All Classes"
+
   const currentClass = useMemo(() => MOCK_CLASSES.find(c => c.id === selectedClassId), [selectedClassId]);
 
-  // Set initial date on client-side after hydration
   useEffect(() => {
     setSelectedDate(new Date());
+    setFilterDate(new Date()); // Initialize filter date as well
   }, []);
 
   useEffect(() => {
     if (currentClass) {
-      // Reset student attendance to 'not_set' when class or date changes
-      // Also, ensure students are reset if the date is not yet defined (initial load)
       if (selectedDate) {
         setStudents(currentClass.students.map(s => ({ ...s, attendance: 'not_set' })));
       } else {
@@ -95,7 +98,6 @@ export function AttendanceForm() {
       setStudents([]);
     }
   }, [selectedClassId, selectedDate, currentClass]);
-
 
   const handleAttendanceChange = (studentId: string, value: Student['attendance']) => {
     setStudents((prevStudents) =>
@@ -118,30 +120,24 @@ export function AttendanceForm() {
     }
 
     setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Shorter delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     const newRecord: RecordedAttendance = {
-      id: `rec_${Date.now()}`, // Simple unique ID
+      id: `rec_${Date.now()}`,
       classInfo: { id: currentClass.id, name: currentClass.name },
-      date: selectedDate, // selectedDate will be defined here due to form validation
-      students: JSON.parse(JSON.stringify(students)), // Deep copy
+      date: selectedDate,
+      students: JSON.parse(JSON.stringify(students)),
       submissionTime: new Date(),
     };
 
-    setRecordedAttendances(prevRecords => [newRecord, ...prevRecords.slice(0, 4)]); // Keep last 5 records
-
+    setRecordedAttendances(prevRecords => [newRecord, ...prevRecords.slice(0, 4)]);
     setIsLoading(false);
-
-    console.log('Données de présence enregistrées localement:', newRecord);
 
     toast({
       title: "Présences Enregistrées !",
       description: `Les présences pour ${currentClass?.name} le ${selectedDate.toLocaleDateString('fr-FR')} ont été enregistrées.`,
       action: <CheckCircle className="text-green-500" />,
     });
-    
-    // Optionally reset form fields or student states here if needed
-    // For now, we keep student states as they might want to make quick adjustments
   };
 
   const getAttendanceBadgeVariant = (status: Student['attendance']) => {
@@ -161,6 +157,14 @@ export function AttendanceForm() {
       default: return 'Non Défini';
     }
   };
+
+  const filteredAttendances = useMemo(() => {
+    return recordedAttendances.filter(record => {
+      const dateMatch = filterDate ? isSameDay(record.date, filterDate) : true;
+      const classMatch = filterClassId ? record.classInfo.id === filterClassId : true;
+      return dateMatch && classMatch;
+    });
+  }, [recordedAttendances, filterDate, filterClassId]);
 
 
   if (!currentClass && MOCK_CLASSES.length > 0) {
@@ -202,7 +206,6 @@ export function AttendanceForm() {
     );
   }
 
-
   return (
     <>
       <Card className="shadow-lg rounded-lg">
@@ -232,11 +235,16 @@ export function AttendanceForm() {
               </div>
               <div>
                 <Label htmlFor="date-picker" className="mb-2 block font-medium">Date</Label>
-                <DatePicker date={selectedDate} setDate={setSelectedDate} buttonProps={{id:"date-picker", disabled:isLoading || !selectedDate}}/>
+                <DatePicker 
+                  date={selectedDate} 
+                  setDate={setSelectedDate} 
+                  buttonProps={{id:"date-picker", disabled:isLoading || !selectedDate}}
+                  calendarProps={{ disabled: (date) => date > new Date() }} // Prevent selecting future dates
+                />
               </div>
             </div>
 
-            {students.length > 0 && selectedDate ? ( // Ensure selectedDate is defined before rendering table
+            {students.length > 0 && selectedDate ? (
               <div className="overflow-x-auto rounded-md border">
                 <Table>
                   <TableHeader>
@@ -307,53 +315,91 @@ export function AttendanceForm() {
               Historique Récent des Saisies de Présence
             </CardTitle>
             <CardDescription>
-              Les 5 derniers enregistrements de cette session. Ces données ne sont pas stockées de façon permanente.
+              Filtrez et visualisez les 5 derniers enregistrements de cette session.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-6">
-              {recordedAttendances.map((record) => (
-                <div key={record.id} className="border p-4 rounded-md shadow-sm">
-                  <div className="flex flex-wrap justify-between items-start mb-3">
-                    <div className="mb-2 sm:mb-0">
-                      <div className="flex items-center text-lg font-semibold text-foreground">
-                        <Users className="mr-2 h-5 w-5 text-primary" />
-                        {record.classInfo.name}
-                      </div>
-                      <div className="flex items-center text-sm text-muted-foreground mt-1">
-                        <CalendarDays className="mr-2 h-4 w-4" />
-                        {record.date.toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                      </div>
+            <div className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-4 items-end p-4 border rounded-md bg-muted/50">
+                    <div>
+                        <Label htmlFor="filter-date-picker" className="mb-2 block font-medium text-sm">Filtrer par Date</Label>
+                         <DatePicker 
+                            date={filterDate} 
+                            setDate={(date) => setFilterDate(date)} 
+                            placeholder="Toutes les dates"
+                            buttonProps={{id:"filter-date-picker", variant: "outline"}}
+                         />
                     </div>
-                    <p className="text-xs text-muted-foreground self-start sm:self-center">
-                      Saisi le: {record.submissionTime.toLocaleTimeString('fr-FR')}
-                    </p>
-                  </div>
-                  
-                  <div className="overflow-x-auto rounded-md border">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="font-medium">Élève</TableHead>
-                          <TableHead className="font-medium text-right">Statut</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {record.students.map((student) => (
-                          <TableRow key={student.id}>
-                            <TableCell>{student.name}</TableCell>
-                            <TableCell className="text-right">
-                              <Badge variant={getAttendanceBadgeVariant(student.attendance)}>
-                                {getAttendanceStatusFrench(student.attendance)}
-                              </Badge>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
+                    <div>
+                        <Label htmlFor="filter-class-select" className="mb-2 block font-medium text-sm">Filtrer par Classe</Label>
+                        <Select onValueChange={(value) => setFilterClassId(value === "all" ? undefined : value)} value={filterClassId || "all"}>
+                            <SelectTrigger id="filter-class-select" className="w-full">
+                                <SelectValue placeholder="Toutes les classes" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">Toutes les classes</SelectItem>
+                                {MOCK_CLASSES.map((cls) => (
+                                <SelectItem key={cls.id} value={cls.id}>
+                                    {cls.name}
+                                </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
-              ))}
+
+                {filteredAttendances.length > 0 ? (
+                    <div className="space-y-6">
+                    {filteredAttendances.map((record) => (
+                        <div key={record.id} className="border p-4 rounded-md shadow-sm">
+                        <div className="flex flex-wrap justify-between items-start mb-3">
+                            <div className="mb-2 sm:mb-0">
+                            <div className="flex items-center text-lg font-semibold text-foreground">
+                                <Users className="mr-2 h-5 w-5 text-primary" />
+                                {record.classInfo.name}
+                            </div>
+                            <div className="flex items-center text-sm text-muted-foreground mt-1">
+                                <CalendarDays className="mr-2 h-4 w-4" />
+                                {format(record.date, "PPP", { locale: (await import('date-fns/locale/fr')).fr })}
+                            </div>
+                            </div>
+                            <p className="text-xs text-muted-foreground self-start sm:self-center">
+                            Saisi le: {record.submissionTime.toLocaleTimeString('fr-FR')}
+                            </p>
+                        </div>
+                        
+                        <div className="overflow-x-auto rounded-md border">
+                            <Table>
+                            <TableHeader>
+                                <TableRow>
+                                <TableHead className="font-medium">Élève</TableHead>
+                                <TableHead className="font-medium text-right">Statut</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {record.students.map((student) => (
+                                <TableRow key={student.id}>
+                                    <TableCell>{student.name}</TableCell>
+                                    <TableCell className="text-right">
+                                    <Badge variant={getAttendanceBadgeVariant(student.attendance)}>
+                                        {getAttendanceStatusFrench(student.attendance)}
+                                    </Badge>
+                                    </TableCell>
+                                </TableRow>
+                                ))}
+                            </TableBody>
+                            </Table>
+                        </div>
+                        </div>
+                    ))}
+                    </div>
+                ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                        <Filter className="mx-auto h-12 w-12 mb-4 text-gray-400" />
+                        <p className="text-lg">Aucun enregistrement de présence trouvé.</p>
+                        <p className="text-sm">Essayez d'ajuster vos filtres ou enregistrez de nouvelles données de présence.</p>
+                    </div>
+                )}
             </div>
           </CardContent>
         </Card>
