@@ -3,56 +3,42 @@
 "use client";
 
 import Link from 'next/link';
-import { BookOpen, Edit3, Home, Users, CalendarCheck2, UserPlus, ClipboardList, ListOrdered, FileText, FileSpreadsheet, Landmark } from 'lucide-react';
-import { usePathname } from 'next/navigation';
-import { cn } from '@/lib/utils';
+import { Edit3, Bell, UserCircle, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
-const navItems = [
-  { href: '/', label: 'Accueil', icon: Home },
-  { href: '/public', label: 'Portail Public', icon: Users },
-  { href: '/inscription-eleve', label: 'Inscriptions', icon: UserPlus },
-  { href: '/liste-eleves', label: 'Liste Élèves', icon: ListOrdered },
-  { href: '/attendance', label: 'Présences', icon: CalendarCheck2 },
-  { href: '/grades', label: 'Saisie Notes', icon: ClipboardList },
-  { href: '/releve-notes', label: 'Relevé Notes', icon: FileText },
-  { href: '/bulletins', label: 'Bulletins', icon: FileSpreadsheet },
-  { href: '/minerval', label: 'Minerval', icon: Landmark },
-  { href: '/learning-material', label: 'Matériel Pédagogique', icon: BookOpen },
-];
+import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
+import { cn } from '@/lib/utils';
 
 export function Header() {
-  const pathname = usePathname();
+  const { isMobile } = useSidebar();
 
   return (
-    <header className="bg-card border-b border-border shadow-sm sticky top-0 z-50">
+    <header className="bg-primary text-primary-foreground shadow-md sticky top-0 z-40"> {/* z-40 to be under sidebar sheet (z-50) */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <Link href="/" className="flex items-center gap-2 text-2xl font-bold text-primary">
+            {isMobile && (
+              <SidebarTrigger className="mr-2 text-primary-foreground hover:bg-primary/80 hover:text-primary-foreground" />
+            )}
+            <Link href="/" className="flex items-center gap-2 text-2xl font-bold text-primary-foreground">
               <Edit3 className="h-8 w-8" />
               <span>La Borne Connect</span>
             </Link>
           </div>
-          <nav className="hidden md:flex flex-wrap justify-center space-x-1 lg:space-x-1"> {/* Ajustement pour flex-wrap et spacing */}
-            {navItems.map((item) => (
-              <Button
-                key={item.label}
-                variant={pathname === item.href ? 'default' : 'ghost'}
-                asChild
-                className={cn(
-                  "font-medium px-2 py-2 text-xs lg:text-sm", // Ajustement de la taille pour plus d'items
-                  pathname === item.href ? "text-primary-foreground" : "text-foreground hover:text-primary"
-                )}
-              >
-                <Link href={item.href} className="flex items-center gap-1 lg:gap-1.5"> {/* Reduced gap for smaller screens */}
-                  <item.icon className="h-3.5 w-3.5 lg:h-4 lg:w-4" />
-                  {item.label}
-                </Link>
-              </Button>
-            ))}
-          </nav>
-          {/* Mobile menu button could be added here */}
+          
+          <div className="flex items-center space-x-2 md:space-x-3">
+            <Button variant="ghost" size="icon" className="text-primary-foreground hover:bg-primary/80 hover:text-primary-foreground">
+              <Bell className="h-5 w-5" />
+              <span className="sr-only">Notifications</span>
+            </Button>
+            <Button variant="ghost" size="icon" className="text-primary-foreground hover:bg-primary/80 hover:text-primary-foreground">
+              <UserCircle className="h-5 w-5" />
+              <span className="sr-only">Profil</span>
+            </Button>
+            <Button variant="ghost" size="icon" className="text-primary-foreground hover:bg-primary/80 hover:text-primary-foreground">
+              <LogOut className="h-5 w-5" />
+              <span className="sr-only">Déconnexion</span>
+            </Button>
+          </div>
         </div>
       </div>
     </header>
