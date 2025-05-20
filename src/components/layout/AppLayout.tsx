@@ -59,10 +59,10 @@ export function AppLayout({ children }: AppLayoutProps) {
            <div className="mb-6 mt-2 group-data-[collapsible=icon]:hidden">
             <Link href="/" passHref>
                 <Image
-                    src="/logo.png" // Assurez-vous que logo.png est dans le dossier public
+                    src="/logo.png" 
                     alt="La Borne Connect Logo"
-                    width={120} // Ajustez la taille au besoin
-                    height={40} // Ajustez la taille au besoin
+                    width={120} 
+                    height={40} 
                     priority
                     data-ai-hint="school logo"
                 />
@@ -71,12 +71,12 @@ export function AppLayout({ children }: AppLayoutProps) {
            <div className="hidden items-center justify-center group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:mb-4">
              <Link href="/" passHref>
                  <Image
-                    src="/logo.png" // Assurez-vous que logo.png est dans le dossier public
+                    src="/logo.png" 
                     alt="La Borne Connect Logo Icon"
-                    width={36} // Taille pour le mode icône
-                    height={36} // Taille pour le mode icône
+                    width={36} 
+                    height={36} 
                     priority
-                    className="rounded-full"
+                    className="rounded-full" // Ensures the icon version is circular
                     data-ai-hint="school logo icon"
                  />
              </Link>
@@ -95,7 +95,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                         isActive={isActive}
                         tooltip={{content: item.label, side: "right", align: "center"}}
                         className={cn(
-                            "font-semibold px-4 py-3 text-sm justify-start",
+                            "font-semibold px-4 py-3 text-sm justify-start", // Applied px-4 py-3
                             isActive 
                             ? "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary/90" 
                             : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
@@ -115,14 +115,14 @@ export function AppLayout({ children }: AppLayoutProps) {
           </SidebarContent>
         </ScrollArea>
         <SidebarFooter className="p-4 border-t border-sidebar-border/30 group-data-[collapsible=icon]:hidden">
-            <UICard className="bg-gradient-to-br from-primary-foreground/10 to-accent/10 border-none shadow-md overflow-hidden">
+             <UICard className="bg-gradient-to-br from-card/5 via-transparent to-card/5 border-none shadow-md overflow-hidden"> {/* Subtle gradient on card */}
                 <UICardContent className="p-4 text-center">
                     <div className="mb-3">
-                        <Image src="https://placehold.co/80x80/7c3aed/ffffff.png?text=📱" alt="Mobile App" width={60} height={60} className="mx-auto rounded-lg" data-ai-hint="mobile app icon"/>
+                        <Image src="https://placehold.co/80x80/FFFFFF/a770ef.png?text=📱" alt="Mobile App" width={60} height={60} className="mx-auto rounded-lg shadow-lg" data-ai-hint="mobile app icon"/>
                     </div>
                     <p className="text-sm font-semibold text-sidebar-foreground mb-1">Download the Mobile App</p>
                     <p className="text-xs text-sidebar-foreground/70 mb-3">Get the full experience on your phone.</p>
-                    <Button variant="outline" size="sm" className="w-full bg-sidebar-foreground text-sidebar-background hover:bg-sidebar-foreground/90">
+                    <Button variant="outline" size="sm" className="w-full bg-sidebar-foreground text-sidebar-background hover:bg-sidebar-foreground/90 border-sidebar-foreground/30">
                         <Download className="mr-2 h-4 w-4" /> Download
                     </Button>
                 </UICardContent>
