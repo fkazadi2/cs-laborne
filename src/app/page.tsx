@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -111,58 +112,7 @@ export default function HomePage() {
       </section>
 
       <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-8">
-        {/* Colonne de Gauche: Calendrier et Événements */}
-        <aside className="md:col-span-4 lg:col-span-3 space-y-6">
-          <Card className="shadow-md rounded-lg">
-            <CardHeader>
-              <CardTitle className="text-xl text-primary flex items-center">
-                <CalendarDays className="mr-2 h-5 w-5" /> Calendrier Scolaire
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex justify-center">
-              <Calendar
-                mode="single"
-                selected={calendarDate}
-                onSelect={setCalendarDate}
-                className="rounded-md"
-                locale={require('date-fns/locale/fr').fr}
-              />
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-md rounded-lg">
-            <CardHeader>
-              <CardTitle className="text-xl text-primary flex items-center">
-                <Info className="mr-2 h-5 w-5" /> Événements à Venir
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {upcomingEventsData.length > 0 ? (
-                upcomingEventsData.slice(0,3).map(event => ( // Limiter à 3 événements pour l'aperçu
-                  <Card key={event.id} className="bg-muted/30 p-3 rounded-md shadow-sm hover:shadow-md transition-shadow">
-                    <div className="flex items-start space-x-3">
-                       <event.icon className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
-                       <div>
-                          <p className="text-sm font-semibold text-foreground">{event.title}</p>
-                          <p className="text-xs text-muted-foreground">{new Date(event.date + 'T00:00:00').toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                          <p className="text-xs text-muted-foreground mt-1">{event.description}</p>
-                       </div>
-                    </div>
-                  </Card>
-                ))
-              ) : (
-                <p className="text-sm text-muted-foreground">Aucun événement programmé pour le moment.</p>
-              )}
-               {upcomingEventsData.length > 3 && (
-                <Button variant="outline" size="sm" className="w-full mt-2" asChild>
-                  <Link href="/public#calendrier">Voir tous les événements</Link>
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        </aside>
-
-        {/* Colonne de Droite: Contenu Principal (Graphiques et Fonctionnalités) */}
+        {/* Colonne de Gauche (Contenu Principal): Graphiques et Fonctionnalités */}
         <main className="md:col-span-8 lg:col-span-9 space-y-12">
           <section className="w-full">
             <div className="flex items-center justify-center mb-10">
@@ -227,10 +177,62 @@ export default function HomePage() {
             </div>
           </section>
         </main>
+
+        {/* Colonne de Droite: Calendrier et Événements */}
+        <aside className="md:col-span-4 lg:col-span-3 space-y-6">
+          <Card className="shadow-md rounded-lg">
+            <CardHeader>
+              <CardTitle className="text-xl text-primary flex items-center">
+                <CalendarDays className="mr-2 h-5 w-5" /> Calendrier Scolaire
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex justify-center">
+              <Calendar
+                mode="single"
+                selected={calendarDate}
+                onSelect={setCalendarDate}
+                className="rounded-md"
+                locale={require('date-fns/locale/fr').fr}
+              />
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-md rounded-lg">
+            <CardHeader>
+              <CardTitle className="text-xl text-primary flex items-center">
+                <Info className="mr-2 h-5 w-5" /> Événements à Venir
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {upcomingEventsData.length > 0 ? (
+                upcomingEventsData.slice(0,3).map(event => ( // Limiter à 3 événements pour l'aperçu
+                  <Card key={event.id} className="bg-muted/30 p-3 rounded-md shadow-sm hover:shadow-md transition-shadow">
+                    <div className="flex items-start space-x-3">
+                       <event.icon className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+                       <div>
+                          <p className="text-sm font-semibold text-foreground">{event.title}</p>
+                          <p className="text-xs text-muted-foreground">{new Date(event.date + 'T00:00:00').toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                          <p className="text-xs text-muted-foreground mt-1">{event.description}</p>
+                       </div>
+                    </div>
+                  </Card>
+                ))
+              ) : (
+                <p className="text-sm text-muted-foreground">Aucun événement programmé pour le moment.</p>
+              )}
+               {upcomingEventsData.length > 3 && (
+                <Button variant="outline" size="sm" className="w-full mt-2" asChild>
+                  <Link href="/public#calendrier">Voir tous les événements</Link>
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+        </aside>
       </div>
     </div>
   );
 }
+    
 
     
 
