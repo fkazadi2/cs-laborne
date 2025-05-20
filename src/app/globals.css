@@ -46,14 +46,14 @@ body {
     --chart-5: 27 87% 67%;
 
     /* Sidebar specific colors - themed for dark blue */
-    --sidebar-background: hsl(var(--primary)); /* Dark blue */
-    --sidebar-foreground: hsl(var(--primary-foreground)); /* Light text */
-    --sidebar-primary: hsl(231, 48%, 90%); /* Lighter blue for active/primary elements in sidebar */
-    --sidebar-primary-foreground: hsl(var(--primary)); /* Dark blue text on light blue active elements */
-    --sidebar-accent: hsl(231, 48%, 60%); /* Medium blue for hover/accent */
-    --sidebar-accent-foreground: hsl(var(--primary-foreground)); /* Light text for accent */
-    --sidebar-border: hsl(231, 48%, 40%); /* Border for sidebar elements */
-    --sidebar-ring: hsl(var(--primary)); /* Ring color for focus */
+    --sidebar-background: 231 48% 48%; /* Dark blue, was hsl(var(--primary)) */
+    --sidebar-foreground: 231 48% 98%; /* Light text, was hsl(var(--primary-foreground)) */
+    --sidebar-primary: 231 48% 90%; /* Lighter blue for active/primary elements in sidebar */
+    --sidebar-primary-foreground: 231 48% 48%; /* Dark blue text on light blue active elements, was hsl(var(--primary)) */
+    --sidebar-accent: 231 48% 60%; /* Medium blue for hover/accent */
+    --sidebar-accent-foreground: 231 48% 98%; /* Light text for accent, was hsl(var(--primary-foreground)) */
+    --sidebar-border: 231 48% 40%; /* Border for sidebar elements */
+    --sidebar-ring: 231 48% 48%; /* Ring color for focus, was hsl(var(--primary)) */
   }
 
   .dark {
@@ -93,14 +93,14 @@ body {
     --chart-5: 340 75% 55%;
 
     /* Sidebar specific colors for dark mode - consistent with dark primary */
-    --sidebar-background: hsl(var(--primary)); 
-    --sidebar-foreground: hsl(var(--primary-foreground));
-    --sidebar-primary: hsl(231, 48%, 75%); 
-    --sidebar-primary-foreground: hsl(231, 48% 10%);
-    --sidebar-accent: hsl(231, 48%, 65%);
-    --sidebar-accent-foreground: hsl(var(--primary-foreground));
-    --sidebar-border: hsl(231, 48%, 30%);
-    --sidebar-ring: hsl(var(--primary));
+    --sidebar-background: 231 48% 58%; /* Use dark mode primary color */
+    --sidebar-foreground: 231 48% 15%; /* Use dark mode primary foreground color */
+    --sidebar-primary: 231 48% 75%; 
+    --sidebar-primary-foreground: 231 48% 10%;
+    --sidebar-accent: 231 48% 65%;
+    --sidebar-accent-foreground: 231 48% 15%; /* Use dark mode primary foreground for accent text */
+    --sidebar-border: 231 48% 30%;
+    --sidebar-ring: 231 48% 58%; /* Use dark mode primary color for ring */
   }
 }
 
