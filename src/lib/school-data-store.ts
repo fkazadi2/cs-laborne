@@ -23,15 +23,30 @@ export interface Subject {
 
 export interface StudentGrade {
   studentId: string;
-  classId: string; 
+  classId: string;
   subjectId: string;
   grade: number;
+}
+
+export interface TuitionFee {
+  classId: string;
+  amount: number;
+  currency?: string; // e.g., "USD", "EUR", "CDF"
+}
+
+export interface PaymentRecord {
+  id: string;
+  studentId: string;
+  classId: string;
+  amountPaid: number;
+  datePaid: Date;
+  currency?: string;
 }
 
 let MOCK_CLASSES_STORE: ClassData[] = [
   {
     id: 'class_a',
-    name: '10ème Année', // Nom simplifié pour les graphiques
+    name: '10ème Année',
     students: [
       { id: 's1', name: 'Grace Ilunga', attendance: 'not_set' },
       { id: 's2', name: 'Daniel Kazadi', attendance: 'not_set' },
@@ -42,7 +57,7 @@ let MOCK_CLASSES_STORE: ClassData[] = [
   },
   {
     id: 'class_b',
-    name: '11ème Année', // Nom simplifié
+    name: '11ème Année',
     students: [
       { id: 's6', name: 'Samuel Ngalula', attendance: 'not_set' },
       { id: 's7', name: 'Ruth Tshibangu', attendance: 'not_set' },
@@ -52,7 +67,7 @@ let MOCK_CLASSES_STORE: ClassData[] = [
   },
   {
     id: 'class_c',
-    name: '12ème Année', // Nom simplifié
+    name: '12ème Année',
     students: [
       { id: 's10', name: 'Moise Lunda', attendance: 'not_set' },
       { id: 's11', name: 'Noella Mwamba', attendance: 'not_set' },
@@ -69,13 +84,21 @@ export const MOCK_SUBJECTS_STORE: Subject[] = [
 ];
 
 let MOCK_GRADES_STORE: StudentGrade[] = [];
-
 let MOCK_REGISTERED_STUDENTS_DETAILS: StudentRegistrationFormValues[] = [];
+
+const MOCK_TUITION_FEES_STORE: TuitionFee[] = [
+    { classId: 'class_a', amount: 500, currency: 'USD' },
+    { classId: 'class_b', amount: 550, currency: 'USD' },
+    { classId: 'class_c', amount: 600, currency: 'USD' },
+];
+
+let MOCK_PAYMENTS_STORE: PaymentRecord[] = [];
+
 
 let listeners: (() => void)[] = [];
 
 export const getClasses = (): ClassData[] => {
-  return JSON.parse(JSON.stringify(MOCK_CLASSES_STORE)); 
+  return JSON.parse(JSON.stringify(MOCK_CLASSES_STORE));
 };
 
 export const getSubjects = (): Subject[] => {
@@ -113,18 +136,14 @@ export const getRegisteredStudentDetails = (): StudentRegistrationFormValues[] =
   return JSON.parse(JSON.stringify(MOCK_REGISTERED_STUDENTS_DETAILS));
 };
 
-// Fonction pour obtenir le nombre total d'élèves inscrits (détails enregistrés)
 export const getTotalRegisteredStudents = (): number => {
   return MOCK_REGISTERED_STUDENTS_DETAILS.length;
 };
 
-// Fonction pour obtenir le nombre d'élèves par classe (basé sur MOCK_CLASSES_STORE)
 export const getStudentCountsPerClass = (): { name: string, students: number }[] => {
   return MOCK_CLASSES_STORE.map(cls => ({ name: cls.name, students: cls.students.length }));
 };
 
-// Fonction pour obtenir un résumé simplifié des performances (réussite/échec)
-// Basé sur les notes individuelles stockées, avec un seuil de réussite.
 export const getOverallPerformanceSummary = (passingGrade: number = 10): { passed: number, failed: number, notGraded: number } => {
   let passed = 0;
   let failed = 0;
@@ -140,15 +159,14 @@ export const getOverallPerformanceSummary = (passingGrade: number = 10): { passe
       }
     }
   });
-  
-  // Calculer le nombre total d'évaluations possibles
+
   let totalPossibleGrades = 0;
   MOCK_CLASSES_STORE.forEach(cls => {
     totalPossibleGrades += cls.students.length * MOCK_SUBJECTS_STORE.length;
   });
   const notGraded = totalPossibleGrades - gradedCount;
 
-  return { passed, failed, notGraded: Math.max(0, notGraded) }; // Assurer que notGraded n'est pas négatif
+  return { passed, failed, notGraded: Math.max(0, notGraded) };
 };
 
 
@@ -156,9 +174,9 @@ export const setStudentGrade = (classId: string, studentId: string, subjectId: s
   const existingGradeIndex = MOCK_GRADES_STORE.findIndex(
     g => g.studentId === studentId && g.subjectId === subjectId && g.classId === classId
   );
-  if (isNaN(grade)) { 
+  if (isNaN(grade)) {
     if (existingGradeIndex > -1) {
-      MOCK_GRADES_STORE.splice(existingGradeIndex, 1); 
+      MOCK_GRADES_STORE.splice(existingGradeIndex, 1);
     }
   } else {
     if (existingGradeIndex > -1) {
@@ -198,6 +216,42 @@ export const getStudentGradesForClass = (studentId: string, classId: string): { 
   });
 };
 
+// --- Tuition Management Functions ---
+export const getTuitionFeeForClass = (classId: string): TuitionFee | undefined => {
+  return JSON.parse(JSON.stringify(MOCK_TUITION_FEES_STORE.find(fee => fee.classId === classId)));
+};
+
+export const recordPayment = (studentId: string, classId: string, amountPaid: number, currency: string = 'USD'): void => {
+  const paymentId = `pay_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  MOCK_PAYMENTS_STORE.push({
+    id: paymentId,
+    studentId,
+    classId,
+    amountPaid,
+    datePaid: new Date(),
+    currency,
+  });
+  notifyListeners();
+};
+
+export const getPaymentsForStudent = (studentId: string, classId: string): PaymentRecord[] => {
+  return JSON.parse(JSON.stringify(MOCK_PAYMENTS_STORE.filter(
+    payment => payment.studentId === studentId && payment.classId === classId
+  )));
+};
+
+export const getOutstandingBalanceForStudent = (studentId: string, classId: string): { balance: number, currency: string, feeAmount: number, totalPaid: number } => {
+  const fee = getTuitionFeeForClass(classId);
+  if (!fee) {
+    return { balance: 0, currency: 'USD', feeAmount: 0, totalPaid: 0 }; // Or handle as error
+  }
+  const payments = getPaymentsForStudent(studentId, classId);
+  const totalPaid = payments.reduce((sum, payment) => sum + payment.amountPaid, 0);
+  const balance = fee.amount - totalPaid;
+  return { balance, currency: fee.currency || 'USD', feeAmount: fee.amount, totalPaid };
+};
+// --- End Tuition Management Functions ---
+
 
 export const subscribe = (listener: () => void): (() => void) => {
   listeners.push(listener);
@@ -214,19 +268,17 @@ const notifyListeners = (): void => {
 
 export const CLASSES_AVAILABLE_FOR_REGISTRATION = MOCK_CLASSES_STORE.map(cls => ({ id: cls.id, name: cls.name }));
 
-// Initialiser quelques notes pour les graphiques
 const initializeMockGrades = () => {
-  if (MOCK_GRADES_STORE.length === 0) { // Seulement si vide
+  if (MOCK_GRADES_STORE.length === 0) {
     const classes = MOCK_CLASSES_STORE;
     const subjects = MOCK_SUBJECTS_STORE;
     classes.forEach(cls => {
       cls.students.forEach(student => {
         subjects.forEach(subject => {
-          // Simuler des notes aléatoires
-          if (Math.random() > 0.2) { // 80% de chance d'avoir une note
-            let grade = Math.random() * 12 + 8; // Note entre 8 et 20
-            if (subject.name === "Mathématiques" && student.name.includes("Sarah")) grade = Math.random() * 5 + 5; // Sarah a plus de mal en maths
-            if (student.name.includes("Daniel") && Math.random() > 0.3) grade = Math.random() * 5 + 15; // Daniel est souvent bon
+          if (Math.random() > 0.2) {
+            let grade = Math.random() * 12 + 8;
+            if (subject.name === "Mathématiques" && student.name.includes("Sarah")) grade = Math.random() * 5 + 5;
+            if (student.name.includes("Daniel") && Math.random() > 0.3) grade = Math.random() * 5 + 15;
              MOCK_GRADES_STORE.push({
               classId: cls.id,
               studentId: student.id,
@@ -241,4 +293,4 @@ const initializeMockGrades = () => {
 };
 
 initializeMockGrades();
-notifyListeners(); // Notifier après initialisation potentielle
+notifyListeners();

@@ -12,16 +12,16 @@ export function TuitionManagementPlaceholder() {
           Module de Gestion du Minerval
         </CardTitle>
         <CardDescription>
-          Cette fonctionnalité est en cours de développement.
+          Cette page est en cours de construction pour une gestion plus détaillée.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col items-center justify-center text-center py-12">
         <Construction className="h-16 w-16 text-muted-foreground mb-6" />
         <p className="text-lg text-muted-foreground mb-2">
-          La gestion détaillée du minerval, incluant le suivi des paiements, la génération de reçus, et la gestion des soldes sera implémentée ici.
+          Les fonctionnalités avancées de gestion du minerval, incluant la configuration des frais, le suivi détaillé des paiements sur plusieurs périodes, la génération de reçus, et la gestion des soldes sera implémentée ici.
         </p>
         <p className="text-sm text-muted-foreground">
-          Revenez bientôt pour découvrir cette fonctionnalité !
+          Pour l'instant, utilisez le formulaire ci-dessus pour une gestion basique.
         </p>
       </CardContent>
     </Card>
