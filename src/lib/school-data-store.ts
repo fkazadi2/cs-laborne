@@ -31,32 +31,32 @@ export interface StudentGrade {
 let MOCK_CLASSES_STORE: ClassData[] = [
   {
     id: 'class_a',
-    name: 'Classe A - 10ème Année',
+    name: '10ème Année', // Nom simplifié pour les graphiques
     students: [
-      { id: 's1', name: 'Tresor Ilunga', attendance: 'not_set' },
-      { id: 's2', name: 'Glody Kazadi', attendance: 'not_set' },
-      { id: 's3', name: 'Esther Mbuyi', attendance: 'not_set' },
-      { id: 's4', name: 'Yannick Mutombo', attendance: 'not_set' },
-      { id: 's5', name: 'Naomi Kalonji', attendance: 'not_set' },
+      { id: 's1', name: 'Grace Ilunga', attendance: 'not_set' },
+      { id: 's2', name: 'Daniel Kazadi', attendance: 'not_set' },
+      { id: 's3', name: 'Sarah Mbuyi', attendance: 'not_set' },
+      { id: 's4', name: 'David Mutombo', attendance: 'not_set' },
+      { id: 's5', name: 'Esther Kalonji', attendance: 'not_set' },
     ],
   },
   {
     id: 'class_b',
-    name: 'Classe B - 11ème Année',
+    name: '11ème Année', // Nom simplifié
     students: [
-      { id: 's6', name: 'Fiston Ngalula', attendance: 'not_set' },
-      { id: 's7', name: 'Prisca Tshibangu', attendance: 'not_set' },
-      { id: 's8', name: 'Alain Kabongo', attendance: 'not_set' },
-      { id: 's9', name: 'Divine Kasongo', attendance: 'not_set' },
+      { id: 's6', name: 'Samuel Ngalula', attendance: 'not_set' },
+      { id: 's7', name: 'Ruth Tshibangu', attendance: 'not_set' },
+      { id: 's8', name: 'Jonathan Kabongo', attendance: 'not_set' },
+      { id: 's9', name: 'Deborah Kasongo', attendance: 'not_set' },
     ],
   },
   {
     id: 'class_c',
-    name: 'Classe C - 12ème Année',
+    name: '12ème Année', // Nom simplifié
     students: [
-      { id: 's10', name: 'Cedrick Lunda', attendance: 'not_set' },
-      { id: 's11', name: 'Gracia Mwamba', attendance: 'not_set' },
-      { id: 's12', name: 'Joel Mukendi', attendance: 'not_set' },
+      { id: 's10', name: 'Moise Lunda', attendance: 'not_set' },
+      { id: 's11', name: 'Noella Mwamba', attendance: 'not_set' },
+      { id: 's12', name: 'Joshua Mukendi', attendance: 'not_set' },
     ],
   }
 ];
@@ -113,6 +113,45 @@ export const getRegisteredStudentDetails = (): StudentRegistrationFormValues[] =
   return JSON.parse(JSON.stringify(MOCK_REGISTERED_STUDENTS_DETAILS));
 };
 
+// Fonction pour obtenir le nombre total d'élèves inscrits (détails enregistrés)
+export const getTotalRegisteredStudents = (): number => {
+  return MOCK_REGISTERED_STUDENTS_DETAILS.length;
+};
+
+// Fonction pour obtenir le nombre d'élèves par classe (basé sur MOCK_CLASSES_STORE)
+export const getStudentCountsPerClass = (): { name: string, students: number }[] => {
+  return MOCK_CLASSES_STORE.map(cls => ({ name: cls.name, students: cls.students.length }));
+};
+
+// Fonction pour obtenir un résumé simplifié des performances (réussite/échec)
+// Basé sur les notes individuelles stockées, avec un seuil de réussite.
+export const getOverallPerformanceSummary = (passingGrade: number = 10): { passed: number, failed: number, notGraded: number } => {
+  let passed = 0;
+  let failed = 0;
+  let gradedCount = 0;
+
+  MOCK_GRADES_STORE.forEach(gradeEntry => {
+    if (typeof gradeEntry.grade === 'number' && !isNaN(gradeEntry.grade)) {
+      gradedCount++;
+      if (gradeEntry.grade >= passingGrade) {
+        passed++;
+      } else {
+        failed++;
+      }
+    }
+  });
+  
+  // Calculer le nombre total d'évaluations possibles
+  let totalPossibleGrades = 0;
+  MOCK_CLASSES_STORE.forEach(cls => {
+    totalPossibleGrades += cls.students.length * MOCK_SUBJECTS_STORE.length;
+  });
+  const notGraded = totalPossibleGrades - gradedCount;
+
+  return { passed, failed, notGraded: Math.max(0, notGraded) }; // Assurer que notGraded n'est pas négatif
+};
+
+
 export const setStudentGrade = (classId: string, studentId: string, subjectId: string, grade: number): void => {
   const existingGradeIndex = MOCK_GRADES_STORE.findIndex(
     g => g.studentId === studentId && g.subjectId === subjectId && g.classId === classId
@@ -129,7 +168,6 @@ export const setStudentGrade = (classId: string, studentId: string, subjectId: s
     }
   }
   notifyListeners();
-  console.log("Updated MOCK_GRADES_STORE:", MOCK_GRADES_STORE);
 };
 
 export const getStudentGrade = (classId: string, studentId: string, subjectId: string): number | undefined => {
@@ -146,7 +184,7 @@ export const getAllGradesForClass = (classId: string): StudentGrade[] => {
 };
 
 export const getStudentGradesForClass = (studentId: string, classId: string): { subject: Subject; grade?: number }[] => {
-  const subjects = getSubjects(); // Get all available subjects
+  const subjects = getSubjects();
   const studentGradesForClass = MOCK_GRADES_STORE.filter(
     (g) => g.studentId === studentId && g.classId === classId
   );
@@ -176,3 +214,31 @@ const notifyListeners = (): void => {
 
 export const CLASSES_AVAILABLE_FOR_REGISTRATION = MOCK_CLASSES_STORE.map(cls => ({ id: cls.id, name: cls.name }));
 
+// Initialiser quelques notes pour les graphiques
+const initializeMockGrades = () => {
+  if (MOCK_GRADES_STORE.length === 0) { // Seulement si vide
+    const classes = MOCK_CLASSES_STORE;
+    const subjects = MOCK_SUBJECTS_STORE;
+    classes.forEach(cls => {
+      cls.students.forEach(student => {
+        subjects.forEach(subject => {
+          // Simuler des notes aléatoires
+          if (Math.random() > 0.2) { // 80% de chance d'avoir une note
+            let grade = Math.random() * 12 + 8; // Note entre 8 et 20
+            if (subject.name === "Mathématiques" && student.name.includes("Sarah")) grade = Math.random() * 5 + 5; // Sarah a plus de mal en maths
+            if (student.name.includes("Daniel") && Math.random() > 0.3) grade = Math.random() * 5 + 15; // Daniel est souvent bon
+             MOCK_GRADES_STORE.push({
+              classId: cls.id,
+              studentId: student.id,
+              subjectId: subject.id,
+              grade: parseFloat(grade.toFixed(1))
+            });
+          }
+        });
+      });
+    });
+  }
+};
+
+initializeMockGrades();
+notifyListeners(); // Notifier après initialisation potentielle

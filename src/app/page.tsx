@@ -2,7 +2,11 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, BookOpen, CalendarCheck2, ArrowRight, UserPlus, ClipboardList, ListOrdered, FileText, FileSpreadsheet } from 'lucide-react';
+import { Users, BookOpen, CalendarCheck2, ArrowRight, UserPlus, ClipboardList, ListOrdered, FileText, FileSpreadsheet, BarChart3 } from 'lucide-react';
+import { TotalStudentsCard } from '@/components/dashboard-charts/TotalStudentsCard';
+import { StudentsByClassChart } from '@/components/dashboard-charts/StudentsByClassChart';
+import { OverallPerformanceChart } from '@/components/dashboard-charts/OverallPerformanceChart';
+
 
 const features = [
   {
@@ -66,7 +70,7 @@ const features = [
 export default function HomePage() {
   return (
     <div className="flex flex-col items-center justify-center">
-      <section className="text-center py-12 md:py-20">
+      <section className="text-center py-12 md:py-16">
         <h1 className="text-4xl md:text-5xl font-bold text-primary mb-6">
           Bienvenue à La Borne Connect
         </h1>
@@ -81,6 +85,25 @@ export default function HomePage() {
             <Link href="/inscription-eleve">Inscrire un Élève</Link>
           </Button>
         </div>
+      </section>
+
+      <section className="w-full py-12 md:py-16">
+        <div className="flex items-center justify-center mb-10">
+            <BarChart3 className="h-10 w-10 text-primary mr-3" />
+            <h2 className="text-3xl font-semibold text-center text-primary">Aperçu Analytique</h2>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+          <TotalStudentsCard />
+          <div className="lg:col-span-2">
+            <StudentsByClassChart />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-12">
+            <OverallPerformanceChart />
+        </div>
+         <p className="text-sm text-muted-foreground text-center mb-10">
+            Remarque : Les graphiques sur les présences, les performances semestrielles et le minerval nécessitent une structuration de données plus avancée et seront ajoutés ultérieurement.
+        </p>
       </section>
 
       <section className="w-full py-12 md:py-16">
