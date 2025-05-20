@@ -50,24 +50,26 @@ export function AppLayout({ children }: AppLayoutProps) {
            <div className="mb-6 mt-2 group-data-[collapsible=icon]:hidden">
             <Link href="/" passHref>
               <Image
-                src="/logo.png" // Assumes logo.png is in public folder
+                src="/logo.png" // S'attend à trouver logo.png dans le dossier public
                 alt="Logo C.S. La Borne"
-                width={100} // Adjust width as needed
-                height={100} // Adjust height as needed
+                width={100} 
+                height={100} 
                 className="rounded-full border-2 border-sidebar-primary"
                 data-ai-hint="school logo"
+                priority // Ajout de priority car le logo est probablement "above the fold"
               />
             </Link>
           </div>
            <div className="hidden items-center gap-2 text-lg font-semibold text-sidebar-foreground group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:mb-4">
              <Link href="/" passHref>
                 <Image
-                    src="/logo.png"
+                    src="/logo.png" // S'attend à trouver logo.png dans le dossier public
                     alt="Logo C.S. La Borne"
-                    width={32}
-                    height={32}
+                    width={36} // Légèrement augmenté pour le mode icône
+                    height={36}
                     className="rounded-full"
                     data-ai-hint="school logo"
+                    priority
                 />
              </Link>
           </div>
