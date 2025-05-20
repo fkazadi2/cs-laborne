@@ -18,12 +18,12 @@ import {
   SidebarInset,
 } from '@/components/ui/sidebar';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Home, Users, UserPlus, ListOrdered, CalendarCheck2, ClipboardList, FileText, FileSpreadsheet, Landmark, BookOpen, Edit3 } from 'lucide-react';
+import { Home, Users, UserPlus, ListOrdered, CalendarCheck2, ClipboardList, FileText, FileSpreadsheet, Landmark, BookOpen, Edit3, Megaphone } from 'lucide-react'; // Added Megaphone
 import { cn } from '@/lib/utils';
 
 const navItems = [
   { href: '/', label: 'Accueil', icon: Home, exactMatch: true },
-  { href: '/public', label: 'Portail Public', icon: Users },
+  { href: '/public', label: 'Portail Public', icon: Megaphone }, // Changed icon to Megaphone
   { href: '/inscription-eleve', label: 'Inscriptions', icon: UserPlus },
   { href: '/liste-eleves', label: 'Liste Élèves', icon: ListOrdered },
   { href: '/attendance', label: 'Présences', icon: CalendarCheck2 },
@@ -52,7 +52,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         </SidebarHeader>
         <ScrollArea className="flex-1">
           <SidebarContent>
-            <SidebarMenu className="gap-1.5"> {/* Increased gap between menu items */}
+            <SidebarMenu className="gap-2"> {/* Increased gap between menu items to gap-2 */}
               {navItems.map((item) => {
                 const isActive = item.exactMatch ? pathname === item.href : pathname.startsWith(item.href);
                 return (
@@ -63,7 +63,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                         isActive={isActive}
                         tooltip={{content: item.label, side: "right", align: "center"}}
                         className={cn(
-                            "font-semibold px-3 py-2.5", // Added bold text and custom padding
+                            "font-semibold px-4 py-3", // Changed padding to px-4 py-3
                             isActive 
                             ? "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary/90" 
                             : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
