@@ -1,4 +1,3 @@
-
 // src/components/layout/AppLayout.tsx
 "use client";
 
@@ -46,8 +45,6 @@ export function AppLayout({ children }: AppLayoutProps) {
     <SidebarProvider defaultOpen>
       <Sidebar variant="sidebar" collapsible="icon" side="left" className="border-r border-sidebar-border">
         <SidebarHeader className="p-4">
-          {/* You can add a logo or title for the sidebar header if needed */}
-          {/* For now, let's keep it clean or perhaps repeat the app icon if expanded */}
            <div className="flex items-center gap-2 text-lg font-semibold text-sidebar-foreground group-data-[collapsible=icon]:hidden">
             <Edit3 className="h-6 w-6" />
             Menu Principal
@@ -55,7 +52,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         </SidebarHeader>
         <ScrollArea className="flex-1">
           <SidebarContent>
-            <SidebarMenu>
+            <SidebarMenu className="gap-1.5"> {/* Increased gap between menu items */}
               {navItems.map((item) => {
                 const isActive = item.exactMatch ? pathname === item.href : pathname.startsWith(item.href);
                 return (
@@ -66,6 +63,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                         isActive={isActive}
                         tooltip={{content: item.label, side: "right", align: "center"}}
                         className={cn(
+                            "font-semibold px-3 py-2.5", // Added bold text and custom padding
                             isActive 
                             ? "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary/90" 
                             : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
