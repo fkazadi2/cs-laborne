@@ -3,6 +3,7 @@
 
 import type { ReactNode } from 'react';
 import Link from 'next/link';
+import Image from 'next/image'; // Import next/image
 import { usePathname } from 'next/navigation';
 import { Header } from './Header';
 import { Footer } from './Footer';
@@ -18,7 +19,7 @@ import {
   SidebarInset,
 } from '@/components/ui/sidebar';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Home, UserPlus, ListOrdered, CalendarCheck2, ClipboardList, FileText, FileSpreadsheet, Landmark, BookOpen, Edit3, Megaphone } from 'lucide-react'; // Added Megaphone
+import { Home, UserPlus, ListOrdered, CalendarCheck2, ClipboardList, FileText, FileSpreadsheet, Landmark, BookOpen, Edit3, Megaphone } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -44,10 +45,31 @@ export function AppLayout({ children }: AppLayoutProps) {
   return (
     <SidebarProvider defaultOpen>
       <Sidebar variant="sidebar" collapsible="icon" side="left" className="bg-sidebar border-r border-sidebar-border">
-        <SidebarHeader className="p-4">
-           <div className="flex items-center gap-2 text-lg font-semibold text-sidebar-foreground group-data-[collapsible=icon]:hidden">
-            <Edit3 className="h-6 w-6" />
-            Menu Principal
+        <SidebarHeader className="p-4 flex flex-col items-center">
+           {/* Logo Section */}
+           <div className="mb-6 mt-2 group-data-[collapsible=icon]:hidden">
+            <Link href="/" passHref>
+              <Image
+                src="/logo.png" // Assumes logo.png is in public folder
+                alt="Logo C.S. La Borne"
+                width={100} // Adjust width as needed
+                height={100} // Adjust height as needed
+                className="rounded-full border-2 border-sidebar-primary"
+                data-ai-hint="school logo"
+              />
+            </Link>
+          </div>
+           <div className="hidden items-center gap-2 text-lg font-semibold text-sidebar-foreground group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:mb-4">
+             <Link href="/" passHref>
+                <Image
+                    src="/logo.png"
+                    alt="Logo C.S. La Borne"
+                    width={32}
+                    height={32}
+                    className="rounded-full"
+                    data-ai-hint="school logo"
+                />
+             </Link>
           </div>
         </SidebarHeader>
         <ScrollArea className="flex-1">
