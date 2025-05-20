@@ -2,90 +2,75 @@
 "use client";
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, BookOpen, CalendarCheck2, ArrowRight, UserPlus, ClipboardList, ListOrdered, FileText, FileSpreadsheet, BarChart3, Landmark, CalendarDays, Info, Megaphone } from 'lucide-react';
-import { TotalStudentsCard } from '@/components/dashboard-charts/TotalStudentsCard';
-import { StudentsByClassChart } from '@/components/dashboard-charts/StudentsByClassChart';
-import { OverallPerformanceChart } from '@/components/dashboard-charts/OverallPerformanceChart';
-import { AttendanceTrendChart } from '@/components/dashboard-charts/AttendanceTrendChart';
-import { SemesterPerformanceChart } from '@/components/dashboard-charts/SemesterPerformanceChart';
-import { TuitionStatusChartPlaceholder } from '@/components/dashboard-charts/TuitionStatusChartPlaceholder';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 import { Calendar } from "@/components/ui/calendar";
-import React from 'react'; // Ensure React is imported for useState
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
+import { ArrowRight, BookOpenText, Activity, ChevronRight, Book, Users, TrendingUp, Clock, ChevronLeft } from 'lucide-react';
+import React from 'react';
 
-const features = [
+const onGoingCoursesData = [
   {
-    icon: Megaphone, // Changed icon to Megaphone
-    title: "Portail d'Information Publique",
-    description: "Accédez aux annonces de l'école, aux actualités et au calendrier des événements. Restez informé sans avoir besoin de vous connecter.",
-    link: '/public',
-    dataAiHint: 'community engagement'
+    title: "Higher Algebra",
+    instructor: "Sarah Jane",
+    progress: 74,
+    image: "https://placehold.co/600x400/a0c4ff/4A5568.png?text=Math", // Pale blueish
+    dataAiHint: "mathematics algebra",
+    bgColorClass: "bg-blue-50",
+    textColorClass: "text-blue-700",
+    progressColor: "bg-blue-500",
   },
   {
-    icon: UserPlus,
-    title: "Inscriptions des Élèves",
-    description: "Gérez facilement les inscriptions des nouveaux élèves, soumettez les formulaires et documents nécessaires en ligne.",
-    link: '/inscription-eleve',
-    dataAiHint: 'student enrollment'
+    title: "Computer Fundamental",
+    instructor: "Amelia Rose",
+    progress: 50,
+    image: "https://placehold.co/600x400/c7d2fe/4A5568.png?text=CS", // Pale purpleish
+    dataAiHint: "computer science",
+    bgColorClass: "bg-indigo-50",
+    textColorClass: "text-indigo-700",
+    progressColor: "bg-indigo-500",
   },
   {
-    icon: ListOrdered,
-    title: "Liste des Élèves Inscrits",
-    description: "Consultez et gérez la liste des élèves inscrits avec leurs informations détaillées.",
-    link: '/liste-eleves',
-    dataAiHint: 'student database'
-  },
-  {
-    icon: CalendarCheck2,
-    title: 'Saisie Simplifiée des Présences',
-    description: "Une interface facile à utiliser pour que les enseignants puissent rapidement marquer les présences des élèves.",
-    link: '/attendance',
-    dataAiHint: 'classroom management'
-  },
-  {
-    icon: ClipboardList,
-    title: "Saisie des Notes par Classe",
-    description: "Encodez les notes par matière pour une classe entière. Calculez les moyennes et préparez les bulletins.",
-    link: '/grades',
-    dataAiHint: 'grade input'
-  },
-  {
-    icon: FileText,
-    title: "Relevé de Notes Détaillé",
-    description: "Consultez un tableau récapitulatif des notes de chaque élève par matière pour une classe donnée.",
-    link: '/releve-notes',
-    dataAiHint: 'academic records'
-  },
-  {
-    icon: FileSpreadsheet,
-    title: "Génération des Bulletins Scolaires",
-    description: "Préparez et générez (simulation) les bulletins de fin d'année pour chaque élève, par classe.",
-    link: '/bulletins',
-    dataAiHint: 'report cards'
-  },
-  {
-    icon: Landmark,
-    title: "Gestion du Minerval",
-    description: "Suivez les paiements des frais de scolarité, gérez les soldes et générez des reçus.",
-    link: '/minerval',
-    dataAiHint: 'tuition fee finance'
-  },
-  {
-    icon: BookOpen,
-    title: 'Générateur de Matériel Pédagogique',
-    description: "Les enseignants peuvent créer sans effort des fiches de révision et des questions pratiques à partir du contenu des cours en utilisant l'IA.",
-    link: '/learning-material',
-    dataAiHint: 'education technology'
+    title: "English for Everyone",
+    instructor: "Elizabeth Ann",
+    progress: 62,
+    image: "https://placehold.co/600x400/fbcfe8/4A5568.png?text=Eng", // Pale pinkish
+    dataAiHint: "english language",
+    bgColorClass: "bg-pink-50",
+    textColorClass: "text-pink-700",
+    progressColor: "bg-pink-500",
   },
 ];
 
-const upcomingEventsData = [
-  { id: 1, date: "2024-09-05", title: "Rentrée Scolaire", description: "Accueil des élèves et début des cours pour la nouvelle année.", icon: CalendarDays, dataAiHint:"school opening" },
-  { id: 2, date: "2024-10-15", title: "Réunion Parents-Professeurs (10ème)", description: "Discussion sur le progrès des élèves de 10ème année.", icon: Users, dataAiHint:"parent teacher meeting" },
-  { id: 3, date: "2024-10-17", title: "Réunion Parents-Professeurs (11ème & 12ème)", description: "Discussion sur le progrès des élèves des classes terminales.", icon: Users, dataAiHint:"parent teacher meeting" },
-  { id: 4, date: "2024-11-20", title: "Journée Sportive Interclasses", description: "Compétitions et activités sportives pour tous les élèves.", icon: Info, dataAiHint:"sports day" },
-  { id: 5, date: "2024-12-15", title: "Excursions de Fin de Semestre", description: "Sorties éducatives pour les différentes classes.", icon: CalendarDays, dataAiHint:"field trip" },
+const studyStatisticsData = [
+  { name: 'Sun', higherAlgebra: 4, computerFundamental: 2.4, englishForEveryone: 2.4 },
+  { name: 'Mon', higherAlgebra: 3, computerFundamental: 1.3, englishForEveryone: 2.2 },
+  { name: 'Tue', higherAlgebra: 2, computerFundamental: 6.8, englishForEveryone: 2.2 }, // Adjusted data for visual interest
+  { name: 'Wed', higherAlgebra: 2.7, computerFundamental: 3.9, englishForEveryone: 2 },
+  { name: 'Thu', higherAlgebra: 1.8, computerFundamental: 4.8, englishForEveryone: 2.1 },
+  { name: 'Fri', higherAlgebra: 2.3, computerFundamental: 3.8, englishForEveryone: 2.5 },
+  { name: 'Sat', higherAlgebra: 3.4, computerFundamental: 4.3, englishForEveryone: 2.1 },
+];
+
+const chartConfig = {
+  higherAlgebra: { label: "Higher Algebra", color: "hsl(var(--chart-1))" },
+  computerFundamental: { label: "Computer Fundamental", color: "hsl(var(--chart-2))" },
+  englishForEveryone: { label: "English for Everyone", color: "hsl(var(--chart-3))" },
+};
+
+
+const remainingHomeworkData = [
+  { title: "Linear Transformation", deadline: "Deadline: March 09, 2023", progress: 25, icon: BookOpenText, iconColor: "text-orange-500", bgColor: "bg-orange-50" },
+  { title: "Problem Solving with C", deadline: "Deadline: March 10, 2023", progress: 50, icon: Activity, iconColor: "text-teal-500", bgColor: "bg-teal-50" },
+];
+
+const upcomingClassesData = [
+  { time: "09:00 AM - 10:00 AM", title: "Higher Algebra", instructor: "Sarah Jane", color: "bg-blue-500" },
+  { time: "10:00 AM - 11:00 AM", title: "Computer Fundamental", instructor: "Amelia Rose", color: "bg-indigo-500" },
+  { time: "11:00 AM - 12:00 PM", title: "English for Everyone", instructor: "Elizabeth Ann", color: "bg-pink-500" },
 ];
 
 
@@ -93,147 +78,161 @@ export default function HomePage() {
   const [calendarDate, setCalendarDate] = React.useState<Date | undefined>(new Date());
 
   return (
-    <div className="flex flex-col items-center justify-center">
-      <section className="text-center py-12 md:py-16 w-full">
-        <h1 className="text-4xl md:text-5xl font-bold text-primary mb-6">
-          Bienvenue à La Borne Connect
-        </h1>
-        <p className="text-lg md:text-xl text-foreground max-w-3xl mx-auto mb-8">
-          Votre système de gestion scolaire moderne, sécurisé et facile à utiliser pour C.S. La Borne.
-        </p>
-        <div className="flex justify-center gap-4">
-          <Button size="lg" asChild>
-            <Link href="/public">Explorer le Portail Public</Link>
-          </Button>
-           <Button size="lg" variant="outline" asChild>
-            <Link href="/inscription-eleve">Inscrire un Élève</Link>
-          </Button>
-        </div>
-      </section>
-
-      <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-8">
-        {/* Colonne de Gauche (Contenu Principal): Graphiques et Fonctionnalités */}
-        <main className="md:col-span-8 lg:col-span-9 space-y-12">
-          <section className="w-full">
-            <div className="flex items-center justify-center mb-10">
-                <BarChart3 className="h-10 w-10 text-primary mr-3" />
-                <h2 className="text-3xl font-semibold text-center text-primary">Aperçu Analytique</h2>
+    <div className="flex flex-col space-y-6">
+      {/* Main content area and Right sidebar */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main content */}
+        <main className="lg:col-span-2 space-y-6">
+          {/* On Going Courses */}
+          <section>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">On Going Courses</h2>
+              <Button variant="link" className="text-sm text-primary p-0 h-auto hover:text-primary/80">See All</Button>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
-              <TotalStudentsCard />
-              <div className="lg:col-span-2">
-                <StudentsByClassChart />
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {onGoingCoursesData.map((course) => (
+                <Card key={course.title} className={`overflow-hidden shadow-md hover:shadow-lg transition-shadow rounded-xl border ${course.bgColorClass}`}>
+                  <CardHeader className="p-0">
+                    <Image
+                      src={course.image}
+                      alt={course.title}
+                      width={600}
+                      height={300} // Adjusted height for a more common aspect ratio
+                      className="w-full h-32 object-cover" // Fixed height for consistency
+                      data-ai-hint={course.dataAiHint}
+                    />
+                  </CardHeader>
+                  <CardContent className="p-4">
+                    <CardTitle className={`text-md font-semibold mb-1 ${course.textColorClass}`}>{course.title}</CardTitle>
+                    <CardDescription className="text-xs text-muted-foreground mb-3">{course.instructor}</CardDescription>
+                    <div className="flex items-center justify-between text-xs">
+                        <Progress value={course.progress} className={`h-1.5 ${course.progressColor}`} indicatorClassName={course.progressColor}/>
+                        <span className={`ml-2 font-medium ${course.textColorClass}`}>{course.progress}%</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-                <OverallPerformanceChart />
-                <AttendanceTrendChart />
-            </div>
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-                <SemesterPerformanceChart />
-                <TuitionStatusChartPlaceholder />
-            </div>
-             <p className="text-sm text-muted-foreground text-center mb-10">
-                Remarque : Les graphiques sur cette page utilisent des données de démonstration ou simplifiées. L'historisation complète des données de présence, la gestion par semestre et le suivi du minerval seront ajoutés ultérieurement pour des analyses plus approfondies.
-            </p>
           </section>
 
-          <section className="w-full">
-            <h2 className="text-3xl font-semibold text-center mb-10 text-primary">Fonctionnalités Principales</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-              {features.map((feature) => (
-                <Card key={feature.title} className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-lg overflow-hidden">
-                  <CardHeader className="bg-primary/10 p-6">
-                    <div className="flex items-center gap-4">
-                      <feature.icon className="h-10 w-10 text-primary" />
-                      <CardTitle className="text-xl text-primary">{feature.title}</CardTitle>
+          {/* Study Statistics */}
+          <section>
+            <Card className="shadow-md hover:shadow-lg transition-shadow rounded-xl border">
+              <CardHeader>
+                <div className="flex justify-between items-center">
+                    <CardTitle className="text-lg font-semibold">Study Statistics</CardTitle>
+                    <Button variant="ghost" size="sm" className="text-xs text-muted-foreground">Last Week <ChevronRight className="h-3 w-3 ml-1 opacity-50"/></Button>
+                </div>
+              </CardHeader>
+              <CardContent className="h-[300px] pl-0 pr-4 pb-4">
+                 <ChartContainer config={chartConfig} className="h-full w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={studyStatisticsData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border) / 0.5)" />
+                        <XAxis dataKey="name" tickLine={false} axisLine={false} fontSize={12} dy={10} />
+                        <YAxis tickFormatter={(value) => `${value}h`} tickLine={false} axisLine={false} fontSize={12} width={40}/>
+                        <Tooltip content={<ChartTooltipContent indicator="line" />} />
+                        <Legend iconType="circle" iconSize={8} wrapperStyle={{paddingTop: 20}}/>
+                        <Line type="monotone" dataKey="higherAlgebra" stroke="var(--color-higherAlgebra)" strokeWidth={2.5} dot={false} activeDot={{ r: 5 }} />
+                        <Line type="monotone" dataKey="computerFundamental" stroke="var(--color-computerFundamental)" strokeWidth={2.5} dot={false} activeDot={{ r: 5 }} />
+                        <Line type="monotone" dataKey="englishForEveryone" stroke="var(--color-englishForEveryone)" strokeWidth={2.5} dot={false} activeDot={{ r: 5 }} />
+                        </LineChart>
+                    </ResponsiveContainer>
+                 </ChartContainer>
+              </CardContent>
+            </Card>
+          </section>
+
+          {/* Remaining Homework */}
+          <section>
+            <h2 className="text-xl font-semibold mb-4">Remaining Homework</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {remainingHomeworkData.map((homework) => (
+                <Card key={homework.title} className={`shadow-md hover:shadow-lg transition-shadow rounded-xl border ${homework.bgColor}`}>
+                  <CardContent className="p-4 flex items-center justify-between">
+                    <div className="flex items-center">
+                        <div className={`p-2.5 rounded-lg mr-3 ${homework.iconColor} bg-white`}>
+                            <homework.icon className="h-5 w-5"/>
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-foreground">{homework.title}</p>
+                            <p className="text-xs text-muted-foreground">{homework.deadline}</p>
+                        </div>
                     </div>
-                  </CardHeader>
-                  <CardContent className="p-6 flex-grow">
-                    <CardDescription className="text-base text-muted-foreground mb-6">
-                      {feature.description}
-                    </CardDescription>
+                     <div className="flex items-center">
+                        <div className="relative h-8 w-8 mr-2">
+                            <PieChart width={32} height={32}>
+                                <Pie
+                                    data={[{ name: 'Completed', value: homework.progress }, { name: 'Remaining', value: 100 - homework.progress }]}
+                                    cx="50%" cy="50%" innerRadius={10} outerRadius={14} dataKey="value"
+                                    paddingAngle={0}
+                                    startAngle={90}
+                                    endAngle={90 + 360 * (homework.progress/100) - (homework.progress === 100 ? 0 : 3)} // Small gap if not 100%
+                                >
+                                <Cell fill={homework.progress === 100 ? "hsl(var(--chart-1))" : "hsl(var(--chart-1))"} />
+                                <Cell fill="hsl(var(--muted) / 0.3)" />
+                                </Pie>
+                                <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="text-[10px] font-semibold fill-foreground">
+                                {`${homework.progress}%`}
+                                </text>
+                            </PieChart>
+                        </div>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:bg-muted/50">
+                            <ChevronRight className="h-4 w-4" />
+                        </Button>
+                    </div>
                   </CardContent>
-                  <div className="p-6 pt-0 mt-auto">
-                    <Button variant="outline" asChild className="w-full group">
-                      <Link href={feature.link}>
-                        Aller à {feature.title
-                            .replace("des Élèves", "")
-                            .replace("d'Information Publique", "")
-                            .replace("Simplifiée des Présences", "")
-                            .replace("Générateur de ", "")
-                            .replace("Saisie des ", "") 
-                            .replace("Liste des ", "") 
-                            .replace("Relevé de ", "")
-                            .replace("Gestion du ", "")
-                            .replace("Génération des ", "")
-                        }
-                        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                      </Link>
-                    </Button>
-                  </div>
                 </Card>
               ))}
             </div>
           </section>
         </main>
 
-        {/* Colonne de Droite: Calendrier et Événements */}
-        <aside className="md:col-span-4 lg:col-span-3 space-y-6">
-          <Card className="shadow-md rounded-lg">
-            <CardHeader>
-              <CardTitle className="text-xl text-primary flex items-center">
-                <CalendarDays className="mr-2 h-5 w-5" /> Calendrier Scolaire
-              </CardTitle>
+        {/* Right Sidebar */}
+        <aside className="lg:col-span-1 space-y-6">
+          <Card className="shadow-md rounded-xl border">
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-lg font-semibold">Upcoming Classes</CardTitle>
+                <div className="flex space-x-1">
+                    <Button variant="outline" size="icon" className="h-7 w-7"><ChevronLeft className="h-4 w-4"/></Button>
+                    <Button variant="outline" size="icon" className="h-7 w-7"><ChevronRight className="h-4 w-4"/></Button>
+                </div>
+              </div>
             </CardHeader>
-            <CardContent className="flex justify-center">
+            <CardContent className="flex justify-center p-0">
               <Calendar
                 mode="single"
                 selected={calendarDate}
                 onSelect={setCalendarDate}
-                className="rounded-md"
+                className="rounded-md p-2"
                 locale={require('date-fns/locale/fr').fr}
+                classNames={{
+                    caption_label: "text-sm font-medium",
+                    day: "h-8 w-8 text-xs", // Smaller days
+                    head_cell: "text-muted-foreground rounded-md w-8 font-normal text-[0.7rem]", // Smaller head cells
+                    cell: "h-8 w-8 text-center text-xs p-0 relative",
+                }}
               />
             </CardContent>
           </Card>
 
-          <Card className="shadow-md rounded-lg">
-            <CardHeader>
-              <CardTitle className="text-xl text-primary flex items-center">
-                <Info className="mr-2 h-5 w-5" /> Événements à Venir
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {upcomingEventsData.length > 0 ? (
-                upcomingEventsData.slice(0,3).map(event => ( // Limiter à 3 événements pour l'aperçu
-                  <Card key={event.id} className="bg-muted/30 p-3 rounded-md shadow-sm hover:shadow-md transition-shadow">
-                    <div className="flex items-start space-x-3">
-                       <event.icon className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
-                       <div>
-                          <p className="text-sm font-semibold text-foreground">{event.title}</p>
-                          <p className="text-xs text-muted-foreground">{new Date(event.date + 'T00:00:00').toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                          <p className="text-xs text-muted-foreground mt-1">{event.description}</p>
-                       </div>
+          <div className="space-y-3">
+            {upcomingClassesData.map(event => (
+              <Card key={event.title} className="p-3.5 rounded-xl border shadow-sm hover:shadow-md transition-shadow bg-card">
+                <div className="flex items-start space-x-3">
+                    <div className={`w-1.5 h-10 rounded-full ${event.color} mt-0.5`}></div>
+                    <div>
+                        <p className="text-xs text-muted-foreground">{event.time}</p>
+                        <p className="text-sm font-semibold text-foreground">{event.title}</p>
+                        <p className="text-xs text-muted-foreground">{event.instructor}</p>
                     </div>
-                  </Card>
-                ))
-              ) : (
-                <p className="text-sm text-muted-foreground">Aucun événement programmé pour le moment.</p>
-              )}
-               {upcomingEventsData.length > 3 && (
-                <Button variant="outline" size="sm" className="w-full mt-2" asChild>
-                  <Link href="/public#calendrier">Voir tous les événements</Link>
-                </Button>
-              )}
-            </CardContent>
-          </Card>
+                </div>
+              </Card>
+            ))}
+          </div>
         </aside>
       </div>
     </div>
   );
 }
-    
-
-    
-
-    
