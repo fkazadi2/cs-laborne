@@ -6,6 +6,9 @@ import { Users, BookOpen, CalendarCheck2, ArrowRight, UserPlus, ClipboardList, L
 import { TotalStudentsCard } from '@/components/dashboard-charts/TotalStudentsCard';
 import { StudentsByClassChart } from '@/components/dashboard-charts/StudentsByClassChart';
 import { OverallPerformanceChart } from '@/components/dashboard-charts/OverallPerformanceChart';
+import { AttendanceTrendChart } from '@/components/dashboard-charts/AttendanceTrendChart';
+import { SemesterPerformanceChart } from '@/components/dashboard-charts/SemesterPerformanceChart';
+import { TuitionStatusChartPlaceholder } from '@/components/dashboard-charts/TuitionStatusChartPlaceholder';
 
 
 const features = [
@@ -98,11 +101,16 @@ export default function HomePage() {
             <StudentsByClassChart />
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
             <OverallPerformanceChart />
+            <AttendanceTrendChart />
+        </div>
+         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+            <SemesterPerformanceChart />
+            <TuitionStatusChartPlaceholder />
         </div>
          <p className="text-sm text-muted-foreground text-center mb-10">
-            Remarque : Les graphiques sur les présences, les performances semestrielles et le minerval nécessitent une structuration de données plus avancée et seront ajoutés ultérieurement.
+            Remarque : Les graphiques sur cette page utilisent des données de démonstration ou simplifiées. L'historisation complète des données de présence, la gestion par semestre et le suivi du minerval seront ajoutés ultérieurement pour des analyses plus approfondies.
         </p>
       </section>
 
