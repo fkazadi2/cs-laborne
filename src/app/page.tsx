@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, BookOpen, CalendarCheck2, ArrowRight, UserPlus, ClipboardList, ListOrdered, FileText, FileSpreadsheet, BarChart3 } from 'lucide-react';
+import { Users, BookOpen, CalendarCheck2, ArrowRight, UserPlus, ClipboardList, ListOrdered, FileText, FileSpreadsheet, BarChart3, Landmark } from 'lucide-react';
 import { TotalStudentsCard } from '@/components/dashboard-charts/TotalStudentsCard';
 import { StudentsByClassChart } from '@/components/dashboard-charts/StudentsByClassChart';
 import { OverallPerformanceChart } from '@/components/dashboard-charts/OverallPerformanceChart';
@@ -60,6 +60,13 @@ const features = [
     description: "Préparez et générez (simulation) les bulletins de fin d'année pour chaque élève, par classe.",
     link: '/bulletins',
     dataAiHint: 'report cards'
+  },
+  {
+    icon: Landmark,
+    title: "Gestion du Minerval",
+    description: "Suivez les paiements des frais de scolarité, gérez les soldes et générez des reçus.",
+    link: '/minerval',
+    dataAiHint: 'tuition fee finance'
   },
   {
     icon: BookOpen,
@@ -141,6 +148,7 @@ export default function HomePage() {
                         .replace("Saisie des ", "") 
                         .replace("Liste des ", "") 
                         .replace("Relevé de ", "")
+                        .replace("Gestion du ", "")
                         .replace("Génération des ", "")
                     }
                     <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />

@@ -1,8 +1,9 @@
+
 // src/components/layout/Header.tsx
 "use client";
 
 import Link from 'next/link';
-import { BookOpen, Edit3, Home, Users, CalendarCheck2, UserPlus, ClipboardList, ListOrdered, FileText, FileSpreadsheet } from 'lucide-react';
+import { BookOpen, Edit3, Home, Users, CalendarCheck2, UserPlus, ClipboardList, ListOrdered, FileText, FileSpreadsheet, Landmark } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -16,6 +17,7 @@ const navItems = [
   { href: '/grades', label: 'Saisie Notes', icon: ClipboardList },
   { href: '/releve-notes', label: 'Relevé Notes', icon: FileText },
   { href: '/bulletins', label: 'Bulletins', icon: FileSpreadsheet },
+  { href: '/minerval', label: 'Minerval', icon: Landmark },
   { href: '/learning-material', label: 'Matériel Pédagogique', icon: BookOpen },
 ];
 
