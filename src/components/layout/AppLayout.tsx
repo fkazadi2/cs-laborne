@@ -24,18 +24,11 @@ import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Home, UserPlus, ListOrdered, CalendarCheck2, ClipboardList, FileText, FileSpreadsheet, Landmark, BookOpen, Megaphone, Download, Settings, HelpCircle, LogOut, LayoutGrid, Library, FileDigit, Users, BarChart3, Award, CalendarDays, History } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Card as UICard, CardContent as UICardContent } from '@/components/ui/card'; // Renamed to avoid conflict
 
-// Adapted navItems to somewhat match the "EduCare" example, while keeping some app specific ones
 const navItems = [
   { href: '/', label: 'Dashboard', icon: LayoutGrid, exactMatch: true },
   { href: '/public', label: 'Portail Public', icon: Megaphone },
-  // { href: '#', label: 'Courses', icon: Library }, // Example from image
-  // { href: '#', label: 'Documents', icon: FileDigit }, // Example from image
-  // { href: '#', label: 'Progress', icon: BarChart3 }, // Example from image
-  // { href: '#', label: 'Community', icon: Users }, // Example from image
-  // { href: '#', label: 'Achievements', icon: Award }, // Example from image
-  // { href: '#', label: 'Schedule', icon: CalendarDays }, // Example from image
-  // { href: '#', label: 'Home Work', icon: History }, // Example from image
   { href: '/inscription-eleve', label: 'Inscriptions', icon: UserPlus },
   { href: '/liste-eleves', label: 'Liste Élèves', icon: ListOrdered },
   { href: '/attendance', label: 'Présences', icon: CalendarCheck2 },
@@ -61,22 +54,37 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   return (
     <SidebarProvider defaultOpen>
-      <Sidebar variant="sidebar" collapsible="icon" side="left" className="bg-sidebar border-r-0"> {/* Removed border-r from sidebar itself */}
+      <Sidebar variant="sidebar" collapsible="icon" side="left" className="bg-sidebar border-r-0">
         <SidebarHeader className="p-4 pt-6 pb-3 flex flex-col items-center group-data-[collapsible=icon]:items-center">
            <div className="mb-6 mt-2 group-data-[collapsible=icon]:hidden">
-            <Link href="/" passHref className="text-2xl font-bold text-sidebar-foreground">
-              EduCare
+            <Link href="/" passHref>
+                <Image
+                    src="/logo.png" // Assurez-vous que logo.png est dans le dossier public
+                    alt="La Borne Connect Logo"
+                    width={120} // Ajustez la taille au besoin
+                    height={40} // Ajustez la taille au besoin
+                    priority
+                    data-ai-hint="school logo"
+                />
             </Link>
           </div>
-           <div className="hidden items-center justify-center text-lg font-semibold text-sidebar-foreground group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:mb-4">
-             <Link href="/" passHref className="text-xl font-bold text-sidebar-foreground">
-                E
+           <div className="hidden items-center justify-center group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:mb-4">
+             <Link href="/" passHref>
+                 <Image
+                    src="/logo.png" // Assurez-vous que logo.png est dans le dossier public
+                    alt="La Borne Connect Logo Icon"
+                    width={36} // Taille pour le mode icône
+                    height={36} // Taille pour le mode icône
+                    priority
+                    className="rounded-full"
+                    data-ai-hint="school logo icon"
+                 />
              </Link>
           </div>
         </SidebarHeader>
         <ScrollArea className="flex-1">
           <SidebarContent className="px-2">
-            <SidebarMenu className="gap-1.5"> {/* Reduced gap for tighter look */}
+            <SidebarMenu className="gap-2">
               {navItems.map((item) => {
                 const isActive = item.exactMatch ? pathname === item.href : pathname.startsWith(item.href);
                 return (
@@ -87,7 +95,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                         isActive={isActive}
                         tooltip={{content: item.label, side: "right", align: "center"}}
                         className={cn(
-                            "font-medium px-3 py-2.5 text-sm justify-start", // Adjusted padding & font
+                            "font-semibold px-4 py-3 text-sm justify-start",
                             isActive 
                             ? "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary/90" 
                             : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
@@ -95,7 +103,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                         )}
                       >
                         <a>
-                          <item.icon className="h-5 w-5" /> {/* Ensured icon size */}
+                          <item.icon className="h-5 w-5" />
                           <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
                         </a>
                       </SidebarMenuButton>
@@ -107,8 +115,8 @@ export function AppLayout({ children }: AppLayoutProps) {
           </SidebarContent>
         </ScrollArea>
         <SidebarFooter className="p-4 border-t border-sidebar-border/30 group-data-[collapsible=icon]:hidden">
-            <Card className="bg-gradient-to-br from-primary-foreground/10 to-accent/10 border-none shadow-md overflow-hidden">
-                <CardContent className="p-4 text-center">
+            <UICard className="bg-gradient-to-br from-primary-foreground/10 to-accent/10 border-none shadow-md overflow-hidden">
+                <UICardContent className="p-4 text-center">
                     <div className="mb-3">
                         <Image src="https://placehold.co/80x80/7c3aed/ffffff.png?text=📱" alt="Mobile App" width={60} height={60} className="mx-auto rounded-lg" data-ai-hint="mobile app icon"/>
                     </div>
@@ -117,8 +125,8 @@ export function AppLayout({ children }: AppLayoutProps) {
                     <Button variant="outline" size="sm" className="w-full bg-sidebar-foreground text-sidebar-background hover:bg-sidebar-foreground/90">
                         <Download className="mr-2 h-4 w-4" /> Download
                     </Button>
-                </CardContent>
-            </Card>
+                </UICardContent>
+            </UICard>
             
             <div className="mt-4">
                  <SidebarMenu className="gap-1">
@@ -152,7 +160,6 @@ export function AppLayout({ children }: AppLayoutProps) {
           <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-6">
             {children}
           </main>
-          {/* Footer can be removed or kept based on preference for this design */}
           {/* <Footer /> */}
         </div>
       </SidebarInset>
@@ -160,6 +167,3 @@ export function AppLayout({ children }: AppLayoutProps) {
     </SidebarProvider>
   );
 }
-
-// Dummy Card and CardContent if not already imported, for the Download App card
-import { Card, CardContent } from '@/components/ui/card';
