@@ -1,3 +1,4 @@
+
 // src/components/layout/AppLayout.tsx
 "use client";
 
@@ -65,7 +66,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                 <Image
                     src="/logo.png" // S'attend à trouver logo.png dans le dossier public
                     alt="Logo C.S. La Borne"
-                    width={36} // Légèrement augmenté pour le mode icône
+                    width={36} 
                     height={36}
                     className="rounded-full"
                     data-ai-hint="school logo"
