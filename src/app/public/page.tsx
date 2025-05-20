@@ -1,206 +1,188 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Megaphone, CalendarDays, Newspaper, Info } from "lucide-react";
+
+// src/app/public/page.tsx
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CalendarDays, Megaphone, Newspaper } from 'lucide-react';
 import Image from 'next/image';
 
+export const metadata = {
+  title: 'Portail Public - La Borne Connect',
+  description: 'Consultez les annonces, actualités et événements de C.S. La Borne.',
+};
+
 const announcements = [
-  { id: 1, title: "School Reopens Monday", date: "August 15, 2024", content: "We are excited to welcome all students back for the new academic year. Please check the website for updated class schedules.", icon: Megaphone, image: "https://placehold.co/600x400.png", dataAiHint: "school opening" },
-  { id: 2, title: "Parent-Teacher Meeting", date: "September 5, 2024", content: "An important meeting for parents and teachers to discuss student progress. Your presence is highly encouraged.", icon: UsersIcon, image: "https://placehold.co/600x400.png", dataAiHint: "meeting discussion"  },
+  {
+    id: 1,
+    title: "Réunion des Parents d'Élèves - 1ère Année",
+    date: "10 Septembre 2024",
+    content: "Une réunion d'information pour les parents des élèves de première année se tiendra dans la salle polyvalente. Votre présence est vivement souhaitée pour discuter du programme de l'année et rencontrer l'équipe pédagogique.",
+    image: "https://placehold.co/600x400.png",
+    dataAiHint: "meeting classroom"
+  },
+  {
+    id: 2,
+    title: "Inscription aux Activités Parascolaires",
+    date: "15 Septembre 2024",
+    content: "Les inscriptions pour les clubs de sport, d'art et de musique sont ouvertes. Veuillez consulter le tableau d'affichage ou le secrétariat pour plus de détails et pour vous inscrire.",
+    image: "https://placehold.co/600x400.png",
+    dataAiHint: "students activities"
+  },
 ];
 
-const calendarEvents = [
-  { id: 1, title: "Independence Day Celebration", date: "June 30, 2024", description: "Join us for a special assembly and cultural program to celebrate Independence Day.", icon: CalendarDays, image: "https://placehold.co/600x400.png", dataAiHint: "national celebration"  },
-  { id: 2, title: "Mid-term Examinations", date: "October 10-15, 2024", description: "Mid-term exams for all grades will be conducted. Please ensure students are well-prepared.", icon: PencilRulerIcon, image: "https://placehold.co/600x400.png", dataAiHint: "exam preparation" },
-  { id: 3, title: "Annual Sports Day", date: "November 20, 2024", description: "A day full of fun, games, and friendly competition. All are welcome to cheer for our students!", icon: TrophyIcon, image: "https://placehold.co/600x400.png", dataAiHint: "sports competition" },
+const newsItems = [
+  {
+    id: 1,
+    title: "Nos Élèves Brillent au Concours de Mathématiques Régional",
+    date: "5 Mai 2024",
+    summary: "Félicitations à nos élèves de 12ème année qui ont remporté les premières places lors du concours de mathématiques inter-écoles. Un grand bravo pour leur travail acharné !",
+    image: "https://placehold.co/600x400.png",
+    dataAiHint: "students award"
+  },
+  {
+    id: 2,
+    title: "Projet de Rénovation de la Bibliothèque",
+    date: "28 Avril 2024",
+    summary: "Le projet de rénovation de notre bibliothèque scolaire a débuté. Nous sommes impatients de vous offrir un espace modernisé et mieux équipé pour la lecture et l'étude.",
+    image: "https://placehold.co/600x400.png",
+    dataAiHint: "library construction"
+  },
 ];
 
-const schoolNews = [
-  { id: 1, title: "Science Fair Success", date: "May 25, 2024", excerpt: "Our students showcased incredible talent at the annual science fair, with several projects winning top prizes.", icon: Newspaper, image: "https://placehold.co/600x400.png", dataAiHint: "science fair"  },
-  { id: 2, title: "New Library Wing Inaugurated", date: "July 10, 2024", excerpt: "The new library wing is now open, offering more resources and a quiet space for students to study and explore.", icon: LibraryIcon, image: "https://placehold.co/600x400.png", dataAiHint: "library books" },
+const upcomingEvents = [
+  {
+    id: 1,
+    title: "Fête de Fin d'Année Scolaire",
+    date: "28 Juin 2024",
+    time: "14h00 - 18h00",
+    location: "Cour de l'école",
+    description: "Rejoignez-nous pour célébrer la fin de l'année scolaire avec des jeux, des spectacles et des rafraîchissements."
+  },
+  {
+    id: 2,
+    title: "Journée Portes Ouvertes",
+    date: "7 Septembre 2024",
+    time: "10h00 - 15h00",
+    location: "C.S. La Borne",
+    description: "Découvrez notre établissement, rencontrez nos enseignants et informez-vous sur nos programmes."
+  },
+  {
+    id: 3,
+    title: "Rentrée Scolaire 2024-2025",
+    date: "9 Septembre 2024",
+    time: "08h00",
+    location: "C.S. La Borne",
+    description: "Accueil des élèves pour la nouvelle année scolaire. Bienvenue à tous !"
+  }
 ];
-
-function UsersIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-      <circle cx="9" cy="7" r="4" />
-      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-    </svg>
-  )
-}
-
-function PencilRulerIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m15 5 4 4" />
-      <path d="M13 7 8.7 2.7a2.41 2.41 0 0 0-3.4 0L2.7 5.3a2.41 2.41 0 0 0 0 3.4L7 13" />
-      <path d="m18 10 4 4" />
-      <path d="M7.5 2.5 19 14" />
-      <path d="M20.5 17.5 19 19l-1.5-1.5" />
-      <path d="m13.5 6.5 1.5 1.5" />
-      <path d="M2.5 7.5 14 19" />
-      <path d="M19 20.5 17.5 19l-1.5 1.5" />
-    </svg>
-  )
-}
-
-function TrophyIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
-      <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
-      <path d="M4 22h16" />
-      <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
-      <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
-      <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
-    </svg>
-  )
-}
-
-function LibraryIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m16 6 4 14" />
-      <path d="M12 6v14" />
-      <path d="M8 8v12" />
-      <path d="M4 4v16" />
-    </svg>
-  )
-}
-
 
 export default function PublicPortalPage() {
   return (
     <div className="space-y-12">
       <section className="text-center">
-        <h1 className="text-4xl font-bold text-primary mb-4">Public Information Portal</h1>
-        <p className="text-lg text-muted-foreground">
-          Stay updated with the latest happenings at C.S. La Borne.
+         <div className="inline-flex items-center justify-center bg-primary/10 text-primary p-4 rounded-full mb-6">
+            <Newspaper className="h-12 w-12" />
+        </div>
+        <h1 className="text-4xl md:text-5xl font-bold text-primary mb-6">
+          Portail d'Information de C.S. La Borne
+        </h1>
+        <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
+          Restez informés des dernières annonces, actualités et événements importants de notre communauté scolaire.
         </p>
       </section>
 
+      {/* Section Annonces */}
       <section>
-        <h2 className="text-3xl font-semibold text-primary mb-6 flex items-center gap-3">
-          <Megaphone className="h-8 w-8" />
-          Announcements
-        </h2>
-        <div className="grid md:grid-cols-2 gap-6">
-          {announcements.map((item) => (
-            <Card key={item.id} className="shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-lg overflow-hidden">
-              <Image src={item.image} alt={item.title} width={600} height={300} className="w-full h-48 object-cover" data-ai-hint={item.dataAiHint}/>
-              <CardHeader>
-                <div className="flex items-center justify-between text-sm text-muted-foreground mb-1">
-                  <item.icon className="h-5 w-5 text-primary" />
-                  <span>{item.date}</span>
-                </div>
-                <CardTitle className="text-xl">{item.title}</CardTitle>
+        <div className="flex items-center mb-6">
+          <Megaphone className="h-8 w-8 text-primary mr-3" />
+          <h2 className="text-3xl font-semibold text-primary">Annonces Récentes</h2>
+        </div>
+        <div className="grid md:grid-cols-2 gap-8">
+          {announcements.map((announcement) => (
+            <Card key={announcement.id} className="shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-lg overflow-hidden">
+              <CardHeader className="p-0">
+                 <Image 
+                    src={announcement.image} 
+                    alt={`Image pour ${announcement.title}`} 
+                    width={600} 
+                    height={400} 
+                    className="object-cover w-full h-48"
+                    data-ai-hint={announcement.dataAiHint}
+                  />
               </CardHeader>
-              <CardContent>
-                <p className="text-foreground">{item.content}</p>
+              <CardContent className="p-6">
+                <CardTitle className="text-xl text-foreground mb-2">{announcement.title}</CardTitle>
+                <p className="text-sm text-muted-foreground mb-3">{announcement.date}</p>
+                <CardDescription className="text-base text-muted-foreground">
+                  {announcement.content}
+                </CardDescription>
               </CardContent>
             </Card>
           ))}
         </div>
+         {announcements.length === 0 && <p className="text-muted-foreground">Aucune annonce pour le moment.</p>}
       </section>
 
+      {/* Section Actualités */}
       <section>
-        <h2 className="text-3xl font-semibold text-primary mb-6 flex items-center gap-3">
-          <CalendarDays className="h-8 w-8" />
-          Calendar Events
-        </h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {calendarEvents.map((event) => (
-            <Card key={event.id} className="shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-lg overflow-hidden">
-              <Image src={event.image} alt={event.title} width={600} height={300} className="w-full h-48 object-cover" data-ai-hint={event.dataAiHint}/>
-              <CardHeader>
-                <div className="flex items-center justify-between text-sm text-muted-foreground mb-1">
-                  <event.icon className="h-5 w-5 text-accent" />
-                   <span>{event.date}</span>
-                </div>
-                <CardTitle className="text-xl">{event.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-foreground">{event.description}</p>
-              </CardContent>
-            </Card>
-          ))}
+         <div className="flex items-center mb-6">
+          <Newspaper className="h-8 w-8 text-accent mr-3" />
+          <h2 className="text-3xl font-semibold text-accent">Actualités de l'École</h2>
         </div>
-        {calendarEvents.length === 0 && (
-          <Card className="text-center p-6 text-muted-foreground">
-            <Info className="mx-auto h-12 w-12 mb-4" />
-            No upcoming events at the moment. Please check back later.
-          </Card>
-        )}
-      </section>
-
-      <section>
-        <h2 className="text-3xl font-semibold text-primary mb-6 flex items-center gap-3">
-          <Newspaper className="h-8 w-8" />
-          School News
-        </h2>
         <div className="space-y-6">
-          {schoolNews.map((newsItem) => (
-            <Card key={newsItem.id} className="shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-lg overflow-hidden md:flex">
-              <Image src={newsItem.image} alt={newsItem.title} width={300} height={200} className="w-full md:w-1/3 h-48 md:h-auto object-cover" data-ai-hint={newsItem.dataAiHint}/>
+          {newsItems.map((news) => (
+            <Card key={news.id} className="shadow-md hover:shadow-lg transition-shadow duration-300 rounded-lg flex flex-col md:flex-row overflow-hidden">
+              <div className="md:w-1/3">
+                <Image 
+                  src={news.image} 
+                  alt={`Image pour ${news.title}`} 
+                  width={600} 
+                  height={400} 
+                  className="object-cover w-full h-48 md:h-full"
+                  data-ai-hint={news.dataAiHint}
+                />
+              </div>
               <div className="md:w-2/3">
                 <CardHeader>
-                  <div className="flex items-center justify-between text-sm text-muted-foreground mb-1">
-                    <newsItem.icon className="h-5 w-5 text-primary" />
-                    <span>{newsItem.date}</span>
-                  </div>
-                  <CardTitle className="text-xl">{newsItem.title}</CardTitle>
+                  <CardTitle className="text-xl text-foreground">{news.title}</CardTitle>
+                  <p className="text-sm text-muted-foreground pt-1">{news.date}</p>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-foreground">{newsItem.excerpt}</p>
+                  <CardDescription className="text-base text-muted-foreground">
+                    {news.summary}
+                  </CardDescription>
                 </CardContent>
               </div>
             </Card>
           ))}
         </div>
+        {newsItems.length === 0 && <p className="text-muted-foreground">Aucune actualité pour le moment.</p>}
+      </section>
+
+      {/* Section Calendrier des Événements */}
+      <section>
+        <div className="flex items-center mb-6">
+          <CalendarDays className="h-8 w-8 text-primary mr-3" />
+          <h2 className="text-3xl font-semibold text-primary">Événements à Venir</h2>
+        </div>
+        <Card className="shadow-lg rounded-lg">
+          <CardContent className="p-6">
+            {upcomingEvents.length > 0 ? (
+              <ul className="space-y-6">
+                {upcomingEvents.map((event) => (
+                  <li key={event.id} className="pb-6 border-b border-border last:border-b-0 last:pb-0">
+                    <h3 className="text-xl font-medium text-foreground mb-1">{event.title}</h3>
+                    <p className="text-sm text-primary font-semibold">
+                      {event.date} {event.time && ` - ${event.time}`}
+                    </p>
+                    <p className="text-sm text-muted-foreground mb-2">{event.location}</p>
+                    <p className="text-base text-muted-foreground">{event.description}</p>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-muted-foreground">Aucun événement à venir programmé pour le moment.</p>
+            )}
+          </CardContent>
+        </Card>
       </section>
     </div>
   );
